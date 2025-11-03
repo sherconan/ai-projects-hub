@@ -1,0 +1,3196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小金助手</title>
+    <!-- Markdown渲染库 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: #fafafa;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ========== 左侧边栏 ========== */
+        .sidebar {
+            width: 196px;
+            background: #ebebeb;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 12px;
+            height: 60px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #5470ff 0%, #3d5fef 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .logo-text {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .toggle-btn {
+            width: 24px;
+            height: 24px;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            color: #666;
+        }
+
+        .new-chat {
+            margin: 8px 12px 12px;
+            padding: 8px 12px;
+            background: linear-gradient(90deg, #6b7bf6 0%, #8b7ce6 100%);
+            border: none;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: left;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .new-chat:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(107, 123, 246, 0.3);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, #6b7bf6 0%, #8b7ce6 100%);
+            color: white;
+        }
+
+        .nav-item svg {
+            flex-shrink: 0;
+        }
+
+        .history-section {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #d9d9d9;
+        }
+
+        .history-title {
+            font-size: 12px;
+            color: #999;
+            padding: 0 12px 8px;
+        }
+
+        .history-item {
+            padding: 6px 12px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 2px;
+            transition: background 0.2s;
+        }
+
+        .history-item:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .sidebar-footer {
+            padding: 12px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #d9d9d9;
+            cursor: pointer;
+        }
+
+        /* ========== 主内容区 ========== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        /* 品牌信息（在首页中间显示）*/
+        .brand-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .brand-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #6b7bf6 0%, #8b7ce6 100%);
+            color: white;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .model-badge {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* 页面容器 */
+        .page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        /* ========== 首页样式 ========== */
+        .home-page {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .home-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 40px;
+        }
+
+        .home-input-container {
+            width: 100%;
+            max-width: 720px;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            margin-bottom: 20px;
+        }
+
+        .home-input-container:focus-within {
+            border-color: #5470ff;
+            box-shadow: 0 0 0 3px rgba(84, 112, 255, 0.1);
+        }
+
+        .home-input {
+            width: 100%;
+            min-height: 100px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            resize: none;
+            font-family: inherit;
+            margin-bottom: 12px;
+        }
+
+        .home-input::placeholder {
+            color: #c4c4c4;
+        }
+
+        .home-input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .char-counter {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: #999;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #5470ff;
+        }
+
+        .send-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #8b9aff 0%, #a8b1ff 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(139, 154, 255, 0.3);
+            transition: all 0.2s;
+        }
+
+        .send-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(139, 154, 255, 0.4);
+        }
+
+        /* 功能开关 */
+        .feature-toggles {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .feature-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .feature-toggle:hover {
+            border-color: #5470ff;
+            background: rgba(84, 112, 255, 0.05);
+        }
+
+        .feature-toggle.active {
+            border-color: #5470ff;
+            background: #5470ff;
+            color: white;
+        }
+
+        .feature-toggle svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* 快捷入口 */
+        .shortcuts {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            max-width: 720px;
+            justify-content: center;
+        }
+
+        .shortcut-btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 1px solid;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .shortcut-btn.pink {
+            border-color: #ff6b9d;
+            color: #ff6b9d;
+        }
+
+        .shortcut-btn.pink:hover {
+            background: #ff6b9d;
+            color: white;
+        }
+
+        .shortcut-btn.blue {
+            border-color: #5470ff;
+            color: #5470ff;
+        }
+
+        .shortcut-btn.blue:hover {
+            background: #5470ff;
+            color: white;
+        }
+
+        .shortcut-btn.purple {
+            border-color: #8b7ce6;
+            color: #8b7ce6;
+        }
+
+        .shortcut-btn.purple:hover {
+            background: #8b7ce6;
+            color: white;
+        }
+
+        .shortcut-btn.orange {
+            border-color: #ff8a56;
+            color: #ff8a56;
+        }
+
+        .shortcut-btn.orange:hover {
+            background: #ff8a56;
+            color: white;
+        }
+
+        /* 页脚 */
+        .page-footer {
+            padding: 12px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        /* 智能写作页面样式（保持之前的样式）*/
+        .writing-page {
+            flex-direction: column;
+        }
+
+        .writing-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 80px 40px 40px;
+        }
+
+        .writing-inner {
+            max-width: 780px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 32px;
+        }
+
+        .main-input-card {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .main-input-card:focus-within {
+            border-color: #5470ff;
+            box-shadow: 0 0 0 3px rgba(84, 112, 255, 0.1);
+        }
+
+        .input-section {
+            margin-bottom: 16px;
+        }
+
+        .input-field {
+            width: 100%;
+            min-height: 80px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            resize: none;
+            font-family: inherit;
+            margin-bottom: 8px;
+        }
+
+        .input-field::placeholder {
+            color: #c4c4c4;
+        }
+
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .toolbar-section {
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+            margin-bottom: 16px;
+        }
+
+        .toolbar-tabs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tab-item {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-item svg {
+            flex-shrink: 0;
+        }
+
+        .tab-item:hover {
+            background: rgba(84, 112, 255, 0.06);
+        }
+
+        .tab-item.active {
+            background: #5470ff;
+            color: white;
+        }
+
+        .toolbar-selects {
+            display: flex;
+            gap: 8px;
+        }
+
+        .select-dropdown {
+            padding: 6px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+            background: white;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .select-dropdown:hover {
+            border-color: #5470ff;
+        }
+
+        .file-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: linear-gradient(135deg, #5470ff 0%, #3d5fef 100%);
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-status-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(84, 112, 255, 0.3);
+        }
+
+        .file-status-badge .close-icon {
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .file-status-badge .close-icon:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .template-section {
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .template-item {
+            padding: 16px;
+            border: 1px solid #e8e8e8;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+            background: white;
+        }
+
+        .template-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: transparent;
+        }
+
+        .template-emoji {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .template-emoji.blue {
+            background: linear-gradient(135deg, #5470ff 0%, #3d5fef 100%);
+        }
+
+        .template-emoji.orange {
+            background: linear-gradient(135deg, #ff8a56 0%, #ff6b6b 100%);
+        }
+
+        .template-emoji.purple {
+            background: linear-gradient(135deg, #9b7ce6 0%, #8566d6 100%);
+        }
+
+        .template-emoji.pink {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff5f8f 100%);
+        }
+
+        .template-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .template-desc {
+            font-size: 12px;
+            color: #999;
+            line-height: 1.4;
+        }
+
+        /* 聊天对话显示 */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 40px 120px 40px;
+            display: none;
+        }
+
+        .chat-messages.active {
+            display: block;
+        }
+
+        /* 固定底部输入区域 */
+        .chat-input-container {
+            position: fixed;
+            bottom: 0;
+            left: 196px;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e5e5;
+            padding: 20px 40px;
+            z-index: 100;
+            display: none;
+        }
+
+        .chat-input-container.active {
+            display: block;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .message-avatar.user {
+            background: linear-gradient(135deg, #6b7bf6 0%, #8b7ce6 100%);
+        }
+
+        .message-avatar.bot {
+            background: linear-gradient(135deg, #5470ff 0%, #3d5fef 100%);
+        }
+
+        .message-content {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.8;
+            word-wrap: break-word;
+        }
+
+        .chat-message.user .message-content {
+            background: linear-gradient(135deg, #6b7bf6 0%, #8b7ce6 100%);
+            color: white;
+        }
+
+        .chat-message.bot .message-content {
+            background: #f7f7f7;
+            color: #333;
+        }
+
+        /* Markdown渲染样式 - 优化版 */
+        .message-content h1,
+        .message-content h2,
+        .message-content h3 {
+            margin: 20px 0 12px 0;
+            font-weight: 600;
+            line-height: 1.4;
+            color: #1a1a1a;
+        }
+
+        .message-content h1 {
+            font-size: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 8px;
+        }
+
+        .message-content h2 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #2c2c2c;
+            margin-top: 24px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .message-content h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 16px;
+        }
+
+        .message-content p {
+            margin: 10px 0;
+            line-height: 1.7;
+            color: #333;
+        }
+
+        /* 首段特殊样式 - 概述部分 */
+        .message-content > p:first-child {
+            margin-bottom: 16px;
+            line-height: 1.8;
+            color: #1a1a1a;
+        }
+
+        .message-content ul,
+        .message-content ol {
+            margin: 14px 0;
+            padding-left: 28px;
+        }
+
+        .message-content li {
+            margin: 8px 0;
+            line-height: 1.7;
+            color: #333;
+        }
+
+        /* 美化列表项符号 */
+        .message-content ul li {
+            position: relative;
+            list-style: none;
+            padding-left: 4px;
+        }
+
+        .message-content ul li::before {
+            content: '•';
+            color: #5470ff;
+            font-weight: bold;
+            font-size: 16px;
+            position: absolute;
+            left: -20px;
+        }
+
+        .message-content strong {
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .message-content code {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .message-content pre {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+
+        .message-content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* 引用标记样式 - 圆圈数字 */
+        .message-content .source-ref {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: #5470ff;
+            color: white;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 3px;
+            vertical-align: middle;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+
+        .message-content .source-ref:hover {
+            background: #3d5fef;
+            transform: scale(1.1);
+        }
+
+        .message-content sup {
+            font-size: 0.75em;
+            color: #5470ff;
+            cursor: pointer;
+            margin: 0 2px;
+        }
+
+        .message-content sup:hover {
+            text-decoration: underline;
+        }
+
+        /* 模型说明样式 */
+        .model-attribution {
+            margin-top: 16px;
+            padding: 8px 12px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #999;
+            text-align: right;
+            border-left: 3px solid #e0e0e0;
+        }
+
+        /* 搜索来源展示 */
+        .search-sources {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .search-sources-title {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .source-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px;
+            margin-bottom: 6px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e5e5e5;
+            transition: all 0.2s;
+        }
+
+        .source-item:hover {
+            border-color: #5470ff;
+            background: rgba(84, 112, 255, 0.02);
+        }
+
+        .source-number {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            background: #5470ff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .source-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .source-title {
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .source-url {
+            font-size: 11px;
+            color: #999;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .source-link {
+            color: #5470ff;
+            text-decoration: none;
+        }
+
+        .source-link:hover {
+            text-decoration: underline;
+        }
+
+        /* 流式输出光标效果 */
+        .message-content.streaming::after {
+            content: '▋';
+            animation: blink 1s infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        /* 对话轮数显示 */
+        .conversation-info {
+            text-align: center;
+            padding: 8px;
+            font-size: 12px;
+            color: #999;
+            background: #f9f9f9;
+            border-radius: 12px;
+            margin: 12px auto;
+            max-width: 300px;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 8px;
+            padding-top: 8px;
+        }
+
+        .message-action {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            color: #999;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .message-action:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        .message-action svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* R1推理过程显示 */
+        .reasoning-section {
+            margin-top: 12px;
+            padding: 12px;
+            background: #fff9e6;
+            border-left: 3px solid #ffc107;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .reasoning-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #f57c00;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .reasoning-title-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reasoning-toggle {
+            font-size: 16px;
+            color: #f57c00;
+            transition: transform 0.2s;
+        }
+
+        .reasoning-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .reasoning-content {
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin-top: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .reasoning-content.collapsed {
+            display: none;
+        }
+
+        /* 文件选择弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: #999;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 24px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        .modal-tabs {
+            display: flex;
+            padding: 0 24px;
+            gap: 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .modal-tab {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .modal-tab.active {
+            color: #5470ff;
+            border-bottom-color: #5470ff;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tab-panel {
+            display: none;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .upload-area {
+            border: 2px dashed #e0e0e0;
+            border-radius: 10px;
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+
+        .upload-area:hover {
+            border-color: #5470ff;
+            background: rgba(84, 112, 255, 0.03);
+        }
+
+        .upload-area.dragover {
+            border-color: #5470ff;
+            background: rgba(84, 112, 255, 0.08);
+        }
+
+        .upload-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            color: #999;
+        }
+
+        .upload-text {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .upload-limit {
+            font-size: 12px;
+            color: #ff6b6b;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: white;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .file-icon {
+            font-size: 24px;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .file-size {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .file-remove {
+            padding: 4px 8px;
+            border: none;
+            background: transparent;
+            color: #ff6b6b;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .file-remove:hover {
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .knowledge-search {
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 12px center;
+        }
+
+        .search-input:focus {
+            border-color: #5470ff;
+            box-shadow: 0 0 0 3px rgba(84, 112, 255, 0.1);
+        }
+
+        .knowledge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .select-all-btn {
+            padding: 6px 12px;
+            border: 1px solid #5470ff;
+            background: transparent;
+            color: #5470ff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .select-all-btn:hover {
+            background: #5470ff;
+            color: white;
+        }
+
+        .folder-tree {
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .folder-item {
+            margin-bottom: 8px;
+        }
+
+        .folder-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .folder-header:hover {
+            background: rgba(84, 112, 255, 0.05);
+        }
+
+        .folder-toggle {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .folder-toggle.expanded {
+            transform: rotate(90deg);
+        }
+
+        .folder-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .folder-icon {
+            width: 20px;
+            height: 20px;
+            color: #5470ff;
+        }
+
+        .folder-name {
+            font-size: 14px;
+            color: #333;
+            flex: 1;
+        }
+
+        .folder-count {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .folder-children {
+            display: none;
+            margin-left: 24px;
+            margin-top: 4px;
+        }
+
+        .folder-children.expanded {
+            display: block;
+        }
+
+        .document-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .document-item:hover {
+            background: rgba(84, 112, 255, 0.05);
+        }
+
+        .document-icon {
+            width: 20px;
+            height: 20px;
+            color: #999;
+        }
+
+        .document-name {
+            font-size: 13px;
+            color: #666;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .selected-count {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .modal-btn.cancel:hover {
+            background: #e8e8e8;
+        }
+
+        .modal-btn.confirm {
+            background: #5470ff;
+            color: white;
+        }
+
+        .modal-btn.confirm:hover {
+            background: #3d5fef;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        /* 隐藏类 */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">J</div>
+                    <span class="logo-text">小金助手</span>
+                </div>
+                <div class="toggle-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 18h13v-2H3v2zm0-5h10v-2H3v2zm0-7v2h13V6H3zm18 9.59L17.42 12 21 8.41 19.59 7l-5 5 5 5L21 15.59z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <button class="new-chat" onclick="createNewChat()">+ 新对话</button>
+
+            <div class="sidebar-nav">
+                <div class="nav-item" data-page="writing">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                    </svg>
+                    智能写作
+                </div>
+                <div class="nav-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
+                    </svg>
+                    数字法律合规营
+                </div>
+                <div class="nav-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                    </svg>
+                    每日市场动态
+                </div>
+                <div class="nav-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                    </svg>
+                    中金智问
+                </div>
+                <div class="nav-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+                    </svg>
+                    中金智译
+                </div>
+                <div class="nav-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>
+                    </svg>
+                    个人知识库
+                </div>
+
+                <div class="history-section">
+                    <div class="history-title">历史对话</div>
+                    <div class="history-item">你好</div>
+                    <div class="history-item">你好</div>
+                    <div class="history-item">你好</div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">所有对话</div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 聊天消息显示区域 -->
+            <div class="chat-messages" id="chatMessages"></div>
+
+            <!-- 固定底部输入框（对话模式） -->
+            <div class="chat-input-container" id="chatInputContainer">
+                <div class="home-input-container" style="margin: 0; max-width: none;">
+                    <textarea
+                        class="home-input"
+                        id="chatInput"
+                        placeholder="继续对话..."
+                        maxlength="4000"
+                        style="min-height: 60px;"
+                    ></textarea>
+
+                    <div class="feature-toggles" style="margin-bottom: 8px;">
+                        <button class="feature-toggle active" onclick="toggleDeepThink()" title="启用DeepSeek R1深度推理模型">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
+                            </svg>
+                            <span>深度思考(R1)</span>
+                        </button>
+                        <button class="feature-toggle" onclick="toggleWebSearch()" title="开启后可联网搜索实时信息">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                            </svg>
+                            联网搜索
+                        </button>
+                        <button class="feature-toggle" onclick="toggleKnowledge()" title="启用个人知识库搜索">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>
+                            </svg>
+                            知识库搜索
+                        </button>
+                    </div>
+
+                    <div class="home-input-footer">
+                        <span class="char-counter"><span id="chatCharCount">0</span> / 4000</span>
+                        <div class="input-actions">
+                            <button class="icon-btn" title="上传文件">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+                                </svg>
+                            </button>
+                            <button class="icon-btn" title="图片">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                                </svg>
+                            </button>
+                            <button class="send-button" onclick="sendChatMessage()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7.33 24l-2.83-2.83 9.17-9.17-9.17-9.17 2.83-2.83 12 12z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 首页 -->
+            <div class="page home-page active" id="homePage">
+                <div class="brand-info">
+                    <div class="brand-badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                        九章智启
+                    </div>
+                    <div class="model-badge">Powered by <span id="currentModel">DeepSeek-R1-671B</span></div>
+                </div>
+
+                <h1 class="home-title">你好，我是小金助手</h1>
+
+                <div class="home-input-container">
+                    <textarea
+                        class="home-input"
+                        id="homeInput"
+                        placeholder="输入你的想法，可通过Shift+回车换行"
+                        maxlength="4000"
+                    ></textarea>
+
+                    <div class="feature-toggles">
+                        <button class="feature-toggle active" id="deepThinkToggle" onclick="toggleDeepThink()" title="启用DeepSeek R1深度推理模型">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
+                            </svg>
+                            <span id="deepThinkLabel">深度思考(R1)</span>
+                        </button>
+                        <button class="feature-toggle" id="webSearchToggle" onclick="toggleWebSearch()" title="开启后可联网搜索实时信息（如天气、新闻等）">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                            </svg>
+                            联网搜索
+                        </button>
+                        <button class="feature-toggle" id="knowledgeToggle" onclick="toggleKnowledge()" title="启用个人知识库搜索">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>
+                            </svg>
+                            知识库搜索
+                        </button>
+                    </div>
+                    <div id="searchTip" style="display: none; margin-top: 8px; padding: 8px 12px; background: #fff3cd; border-left: 3px solid #ffc107; border-radius: 4px; font-size: 12px; color: #856404;">
+                        💡 提示：查询实时信息（如天气、新闻）时，请开启"联网搜索"功能
+                    </div>
+
+                    <div class="home-input-footer">
+                        <span class="char-counter"><span id="homeCharCount">0</span> / 4000</span>
+                        <div class="input-actions">
+                            <button class="icon-btn" title="上传文件">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+                                </svg>
+                            </button>
+                            <button class="icon-btn" title="图片">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                                </svg>
+                            </button>
+                            <button class="send-button" onclick="sendHomeMessage()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7.33 24l-2.83-2.83 9.17-9.17-9.17-9.17 2.83-2.83 12 12z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shortcuts">
+                    <button class="shortcut-btn pink" onclick="navigateTo('writing')">
+                        智能写作 <strong>写出更好内容</strong>
+                    </button>
+                    <button class="shortcut-btn blue">
+                        数字法律合规营 <strong>问清楚/问答题/问专家</strong>
+                    </button>
+                    <button class="shortcut-btn blue">
+                        每日市场动态 <strong>每日深度研究报告</strong>
+                    </button>
+                    <button class="shortcut-btn purple">
+                        中金智问 <strong>上交深交深一指定智能翻译</strong>
+                    </button>
+                    <button class="shortcut-btn orange">
+                        中金智译 <strong>文件、文本智能翻译</strong>
+                    </button>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #999;">
+                    💬 支持多轮对话 | ⚡ 流式输出 | 🧠 深度思考(R1)
+                </div>
+            </div>
+
+            <!-- 智能写作页面 -->
+            <div class="page writing-page" id="writingPage">
+                <div class="writing-content">
+                    <div class="writing-inner">
+                        <h1 class="page-title">写出更好内容</h1>
+
+                        <div class="main-input-card">
+                            <div class="input-section">
+                                <textarea
+                                    class="input-field"
+                                    id="writingInput"
+                                    placeholder="输入你的想法，可通过Shift+回车换行"
+                                    maxlength="4000"
+                                ></textarea>
+                                <div class="input-footer">
+                                    <span class="char-count"><span id="writingCharCount">0</span> / 4000</span>
+                                    <button class="send-button" onclick="sendWritingMessage()">
+                                        <svg viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M7.33 24l-2.83-2.83 9.17-9.17-9.17-9.17 2.83-2.83 12 12z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="toolbar-section">
+                                <div class="toolbar-tabs">
+                                    <button class="tab-item active" data-mode="general">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/>
+                                        </svg>
+                                        通用
+                                    </button>
+                                    <button class="tab-item" data-mode="file">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M22 10l-6-8H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V10zm-7-4.5l5.5 7H15V5.5z"/>
+                                        </svg>
+                                        文件
+                                    </button>
+                                    <button class="tab-item" data-mode="rewrite">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                        </svg>
+                                        仿写
+                                    </button>
+                                    <button class="tab-item" data-mode="polish">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                                        </svg>
+                                        润色
+                                    </button>
+                                    <button class="tab-item" data-mode="expand">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+                                        </svg>
+                                        扩写
+                                    </button>
+                                    <button class="tab-item" data-mode="shrink">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                                        </svg>
+                                        缩写
+                                    </button>
+                                    <button class="tab-item" data-mode="continue">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                        </svg>
+                                        续写
+                                    </button>
+                                </div>
+                                <div class="toolbar-selects">
+                                    <select class="select-dropdown" id="sourceSelect">
+                                        <option value="none">指定参考来源</option>
+                                        <option value="web_search">联网搜索</option>
+                                        <option value="knowledge_base">个人知识库</option>
+                                        <option value="file">指定文件</option>
+                                    </select>
+                                    <span id="fileStatusBadge" style="display: none;"></span>
+                                    <select class="select-dropdown">
+                                        <option>风格不限</option>
+                                        <option>正式</option>
+                                        <option>轻松</option>
+                                        <option>专业</option>
+                                    </select>
+                                    <select class="select-dropdown">
+                                        <option>字数不限</option>
+                                        <option>简短</option>
+                                        <option>中等</option>
+                                        <option>详细</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="template-section">
+                                <div class="template-grid">
+                                    <div class="template-item">
+                                        <div class="template-emoji blue">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                                                <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="template-name">通用</div>
+                                        <div class="template-desc">快速生成高质量内容</div>
+                                    </div>
+                                    <div class="template-item">
+                                        <div class="template-emoji orange">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="template-name">会议记要</div>
+                                        <div class="template-desc">中金专属会议记录模板</div>
+                                    </div>
+                                    <div class="template-item">
+                                        <div class="template-emoji purple">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                                                <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="template-name">周报</div>
+                                        <div class="template-desc">总结一周的工作成果</div>
+                                    </div>
+                                    <div class="template-item">
+                                        <div class="template-emoji pink">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="template-name">邮件</div>
+                                        <div class="template-desc">快速生成高质量内容</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-footer">
+                内容由DeepSeek-R1系列模型生成，请根据使者考...
+            </div>
+        </div>
+    </div>
+
+    <!-- 文件选择弹窗 -->
+    <div class="modal-overlay" id="fileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">选择文件</h3>
+                <button class="modal-close" onclick="closeFileModal()">×</button>
+            </div>
+
+            <div class="modal-tabs">
+                <button class="modal-tab active" data-tab="upload" onclick="switchModalTab('upload')">上传文件</button>
+                <button class="modal-tab" data-tab="knowledge" onclick="switchModalTab('knowledge')">个人知识库</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- 上传文件面板 -->
+                <div class="tab-panel active" id="uploadPanel">
+                    <div class="upload-area" id="uploadArea">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                        </svg>
+                        <div class="upload-text">点击上传或拖拽文件到此处</div>
+                        <div class="upload-hint">支持 PDF, DOC, DOCX, TXT 等格式</div>
+                        <div class="upload-limit">最多上传 50 个文档（已上传 <span id="uploadCount">0</span>/50）</div>
+                    </div>
+                    <input type="file" id="fileInput" multiple style="display: none;" accept=".pdf,.doc,.docx,.txt">
+                    <div class="file-list" id="uploadedFiles"></div>
+                </div>
+
+                <!-- 个人知识库面板 -->
+                <div class="tab-panel" id="knowledgePanel">
+                    <div class="knowledge-search">
+                        <input
+                            type="text"
+                            class="search-input"
+                            id="knowledgeSearch"
+                            placeholder="搜索文件名..."
+                            oninput="filterKnowledgeFiles(this.value)"
+                        >
+                    </div>
+                    <div class="knowledge-header">
+                        <span style="font-size: 14px; color: #666;">选择文件或文件夹</span>
+                        <button class="select-all-btn" onclick="selectAllKnowledge()">全选</button>
+                    </div>
+                    <div class="folder-tree" id="folderTree">
+                        <!-- 对话文件夹 -->
+                        <div class="folder-item">
+                            <div class="folder-header" onclick="toggleFolder('conversation')">
+                                <span class="folder-toggle" id="toggle-conversation">▶</span>
+                                <input type="checkbox" class="folder-checkbox" id="check-conversation" onclick="event.stopPropagation(); checkFolder('conversation')">
+                                <svg class="folder-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+                                </svg>
+                                <span class="folder-name">对话文件夹</span>
+                                <span class="folder-count">12个文件</span>
+                            </div>
+                            <div class="folder-children" id="folder-conversation">
+                                <div class="document-item" onclick="toggleDocument('conv-1')">
+                                    <input type="checkbox" class="folder-checkbox" id="check-conv-1" onclick="event.stopPropagation()">
+                                    <svg class="document-icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                    </svg>
+                                    <span class="document-name">与AI的对话-2024-01-15.txt</span>
+                                </div>
+                                <div class="document-item" onclick="toggleDocument('conv-2')">
+                                    <input type="checkbox" class="folder-checkbox" id="check-conv-2" onclick="event.stopPropagation()">
+                                    <svg class="document-icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                    </svg>
+                                    <span class="document-name">产品需求讨论.txt</span>
+                                </div>
+                                <div class="document-item" onclick="toggleDocument('conv-3')">
+                                    <input type="checkbox" class="folder-checkbox" id="check-conv-3" onclick="event.stopPropagation()">
+                                    <svg class="document-icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                    </svg>
+                                    <span class="document-name">技术方案咨询.txt</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 上传文件夹 -->
+                        <div class="folder-item">
+                            <div class="folder-header" onclick="toggleFolder('upload')">
+                                <span class="folder-toggle" id="toggle-upload">▶</span>
+                                <input type="checkbox" class="folder-checkbox" id="check-upload" onclick="event.stopPropagation(); checkFolder('upload')">
+                                <svg class="folder-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+                                </svg>
+                                <span class="folder-name">上传文件夹</span>
+                                <span class="folder-count">8个文件</span>
+                            </div>
+                            <div class="folder-children" id="folder-upload">
+                                <div class="document-item" onclick="toggleDocument('file-1')">
+                                    <input type="checkbox" class="folder-checkbox" id="check-file-1" onclick="event.stopPropagation()">
+                                    <svg class="document-icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                    </svg>
+                                    <span class="document-name">年度报告2023.pdf</span>
+                                </div>
+                                <div class="document-item" onclick="toggleDocument('file-2')">
+                                    <input type="checkbox" class="folder-checkbox" id="check-file-2" onclick="event.stopPropagation()">
+                                    <svg class="document-icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                    </svg>
+                                    <span class="document-name">产品手册.docx</span>
+                                </div>
+                                <div class="document-item" onclick="toggleDocument('file-3')">
+                                    <input type="checkbox" class="folder-checkbox" id="check-file-3" onclick="event.stopPropagation()">
+                                    <svg class="document-icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                    </svg>
+                                    <span class="document-name">会议纪要.txt</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <span class="selected-count">已选择 <span id="selectedCount">0</span> 个文件</span>
+                <div class="modal-actions">
+                    <button class="modal-btn cancel" onclick="closeFileModal()">取消</button>
+                    <button class="modal-btn confirm" onclick="confirmFileSelection()">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 配置 ====================
+        const DEEPSEEK_API_KEY = 'sk-d12345e832384cbda6213de87a512484';
+        const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+
+        // ==================== 全局状态 ====================
+        let currentPage = 'home';
+        let isDeepThinkEnabled = true;  // 默认开启R1
+        let isWebSearchEnabled = false;
+        let isKnowledgeEnabled = false;
+        let currentModel = 'deepseek-reasoner'; // deepseek-chat 或 deepseek-reasoner
+        let conversationHistory = [];  // 存储对话历史
+
+        // 文件选择相关
+        let uploadedFiles = [];
+        let selectedKnowledgeFiles = new Set();
+        let selectedFilesData = {
+            type: null, // 'upload' or 'knowledge'
+            files: [],
+            count: 0
+        };
+
+        // ==================== 页面切换 ====================
+        function navigateTo(page) {
+            // 更新页面显示
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+            if (page === 'writing') {
+                document.getElementById('writingPage').classList.add('active');
+            } else {
+                document.getElementById('homePage').classList.add('active');
+            }
+
+            // 更新导航高亮
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === page) {
+                    item.classList.add('active');
+                }
+            });
+
+            currentPage = page;
+        }
+
+        // 绑定导航点击事件
+        document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+            item.addEventListener('click', () => {
+                navigateTo(item.dataset.page);
+            });
+        });
+
+        // 初始化：默认不高亮任何导航项（首页状态）
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        });
+
+        // ==================== 首页功能切换 ====================
+        function toggleDeepThink() {
+            isDeepThinkEnabled = !isDeepThinkEnabled;
+            const toggle = document.getElementById('deepThinkToggle');
+            const label = document.getElementById('deepThinkLabel');
+
+            if (isDeepThinkEnabled) {
+                toggle.classList.add('active');
+                currentModel = 'deepseek-reasoner';
+                label.textContent = '深度思考(R1)';
+                document.getElementById('currentModel').textContent = 'DeepSeek-R1-671B';
+            } else {
+                toggle.classList.remove('active');
+                currentModel = 'deepseek-chat';
+                label.textContent = '深度思考';
+                document.getElementById('currentModel').textContent = 'DeepSeek-V3';
+            }
+        }
+
+        function toggleWebSearch() {
+            isWebSearchEnabled = !isWebSearchEnabled;
+            const toggle = document.getElementById('webSearchToggle');
+            const searchTip = document.getElementById('searchTip');
+
+            if (isWebSearchEnabled) {
+                toggle.classList.add('active');
+                console.log('✅ 联网搜索已开启 - AI将自动调用搜索工具获取实时信息');
+                if (searchTip) searchTip.style.display = 'none';
+            } else {
+                toggle.classList.remove('active');
+                console.log('❌ 联网搜索已关闭');
+            }
+        }
+
+        function toggleKnowledge() {
+            isKnowledgeEnabled = !isKnowledgeEnabled;
+            const toggle = document.getElementById('knowledgeToggle');
+            toggle.classList.toggle('active');
+        }
+
+        // ==================== 字符计数 ====================
+        const homeInput = document.getElementById('homeInput');
+        const homeCharCount = document.getElementById('homeCharCount');
+
+        homeInput.addEventListener('input', () => {
+            homeCharCount.textContent = homeInput.value.length;
+
+            // 智能检测是否需要联网搜索
+            const text = homeInput.value.toLowerCase();
+            const needsSearch = /天气|新闻|最新|今天|现在|当前|股票|汇率|实时/.test(text);
+            const searchTip = document.getElementById('searchTip');
+
+            if (needsSearch && !isWebSearchEnabled && searchTip) {
+                searchTip.style.display = 'block';
+            } else if (searchTip) {
+                searchTip.style.display = 'none';
+            }
+        });
+
+        homeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendHomeMessage();
+            }
+        });
+
+        const writingInput = document.getElementById('writingInput');
+        const writingCharCount = document.getElementById('writingCharCount');
+
+        writingInput.addEventListener('input', () => {
+            writingCharCount.textContent = writingInput.value.length;
+        });
+
+        writingInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendWritingMessage();
+            }
+        });
+
+        // ==================== 发送消息 ====================
+        async function sendHomeMessage() {
+            const message = homeInput.value.trim();
+            if (!message) return;
+
+            // 切换到对话视图
+            document.getElementById('homePage').classList.remove('active');
+            const chatMessagesDiv = document.getElementById('chatMessages');
+            chatMessagesDiv.classList.add('active');
+
+            // 显示固定底部输入框
+            document.getElementById('chatInputContainer').classList.add('active');
+
+            // 显示对话轮数信息
+            const conversationRound = Math.floor(conversationHistory.length / 2) + 1;
+            if (conversationRound > 1) {
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'conversation-info';
+                infoDiv.textContent = `第 ${conversationRound} 轮对话（已保存 ${conversationHistory.length} 条历史消息）`;
+                chatMessagesDiv.appendChild(infoDiv);
+            }
+
+            // 添加用户消息
+            appendChatMessage('user', message);
+
+            homeInput.value = '';
+            homeCharCount.textContent = '0';
+
+            // 添加机器人消息占位
+            const botMessage = appendChatMessage('bot', '');
+            const contentDiv = botMessage.querySelector('.message-content');
+
+            // 添加流式输出光标效果
+            contentDiv.classList.add('streaming');
+
+            try {
+                let fullText = '';
+                // 调用DeepSeek API（流式输出）
+                const result = await callDeepSeekAPI(message, (chunk) => {
+                    fullText += chunk;
+                    contentDiv.textContent = fullText;
+                    scrollChatToBottom();
+                }, botMessage);
+
+                // 移除流式输出光标
+                contentDiv.classList.remove('streaming');
+
+                // 使用增强的Markdown渲染最终内容
+                const finalContent = result.content || fullText;
+                contentDiv.innerHTML = renderEnhancedContent(finalContent, result.sources);
+
+                // 添加模型说明
+                const attribution = document.createElement('div');
+                attribution.className = 'model-attribution';
+                attribution.textContent = '内容由 DeepSeek-R1 系列模型生成';
+                contentDiv.appendChild(attribution);
+
+                // 添加搜索来源
+                if (result.sources && result.sources.length > 0) {
+                    const sourcesDiv = document.createElement('div');
+                    sourcesDiv.className = 'search-sources';
+
+                    const sourcesTitle = document.createElement('div');
+                    sourcesTitle.className = 'search-sources-title';
+                    sourcesTitle.textContent = '🔍 搜索来源';
+                    sourcesDiv.appendChild(sourcesTitle);
+
+                    result.sources.forEach((source, index) => {
+                        const sourceItem = document.createElement('div');
+                        sourceItem.className = 'source-item';
+
+                        const sourceNumber = document.createElement('div');
+                        sourceNumber.className = 'source-number';
+                        sourceNumber.textContent = index + 1;
+
+                        const sourceContent = document.createElement('div');
+                        sourceContent.className = 'source-content';
+
+                        const sourceTitle = document.createElement('div');
+                        sourceTitle.className = 'source-title';
+                        sourceTitle.textContent = source.title || '无标题';
+
+                        const sourceUrl = document.createElement('div');
+                        sourceUrl.className = 'source-url';
+                        const sourceLink = document.createElement('a');
+                        sourceLink.className = 'source-link';
+                        sourceLink.href = source.url || '#';
+                        sourceLink.target = '_blank';
+                        sourceLink.textContent = source.url || '';
+                        sourceUrl.appendChild(sourceLink);
+
+                        sourceContent.appendChild(sourceTitle);
+                        sourceContent.appendChild(sourceUrl);
+
+                        sourceItem.appendChild(sourceNumber);
+                        sourceItem.appendChild(sourceContent);
+                        sourcesDiv.appendChild(sourceItem);
+                    });
+
+                    contentDiv.appendChild(sourcesDiv);
+                }
+
+                // 添加操作按钮
+                const actions = document.createElement('div');
+                actions.className = 'message-actions';
+                actions.innerHTML = `
+                    <button class="message-action" onclick="copyMessage(this)" title="复制">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                    </button>
+                    <button class="message-action" onclick="likeMessage(this)" title="点赞">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/>
+                        </svg>
+                    </button>
+                    <button class="message-action" onclick="dislikeMessage(this)" title="点踩">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/>
+                        </svg>
+                    </button>
+                `;
+                botMessage.appendChild(actions);
+            } catch (error) {
+                contentDiv.classList.remove('streaming');
+                contentDiv.textContent = '抱歉，生成回复时出错了。错误：' + error.message;
+            }
+
+            scrollChatToBottom();
+        }
+
+        // 对话模式发送消息
+        async function sendChatMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // 添加用户消息
+            const chatMessagesDiv = document.getElementById('chatMessages');
+            appendChatMessage('user', message);
+
+            chatInput.value = '';
+            document.getElementById('chatCharCount').textContent = '0';
+
+            // 显示对话轮数
+            const conversationRound = Math.floor(conversationHistory.length / 2) + 1;
+            if (conversationRound > 1) {
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'conversation-info';
+                infoDiv.textContent = `第 ${conversationRound} 轮对话（已保存 ${conversationHistory.length} 条历史消息）`;
+                chatMessagesDiv.appendChild(infoDiv);
+            }
+
+            // 添加机器人消息占位
+            const botMessage = appendChatMessage('bot', '');
+            const contentDiv = botMessage.querySelector('.message-content');
+            contentDiv.classList.add('streaming');
+
+            try {
+                let fullText = '';
+                // 调用DeepSeek API
+                const result = await callDeepSeekAPI(message, (chunk) => {
+                    fullText += chunk;
+                    contentDiv.textContent = fullText;
+                    scrollChatToBottom();
+                }, botMessage);
+
+                contentDiv.classList.remove('streaming');
+
+                // 使用增强的Markdown渲染最终内容
+                const finalContent = result.content || fullText;
+                contentDiv.innerHTML = renderEnhancedContent(finalContent, result.sources);
+
+                // 添加模型说明
+                const attribution2 = document.createElement('div');
+                attribution2.className = 'model-attribution';
+                attribution2.textContent = '内容由 DeepSeek-R1 系列模型生成';
+                contentDiv.appendChild(attribution2);
+
+                // 添加搜索来源
+                if (result.sources && result.sources.length > 0) {
+                    const sourcesDiv = document.createElement('div');
+                    sourcesDiv.className = 'search-sources';
+
+                    const sourcesTitle = document.createElement('div');
+                    sourcesTitle.className = 'search-sources-title';
+                    sourcesTitle.textContent = '🔍 搜索来源';
+                    sourcesDiv.appendChild(sourcesTitle);
+
+                    result.sources.forEach((source, index) => {
+                        const sourceItem = document.createElement('div');
+                        sourceItem.className = 'source-item';
+
+                        const sourceNumber = document.createElement('div');
+                        sourceNumber.className = 'source-number';
+                        sourceNumber.textContent = index + 1;
+
+                        const sourceContent = document.createElement('div');
+                        sourceContent.className = 'source-content';
+
+                        const sourceTitle = document.createElement('div');
+                        sourceTitle.className = 'source-title';
+                        sourceTitle.textContent = source.title || '无标题';
+
+                        const sourceUrl = document.createElement('div');
+                        sourceUrl.className = 'source-url';
+                        const sourceLink = document.createElement('a');
+                        sourceLink.className = 'source-link';
+                        sourceLink.href = source.url || '#';
+                        sourceLink.target = '_blank';
+                        sourceLink.textContent = source.url || '';
+                        sourceUrl.appendChild(sourceLink);
+
+                        sourceContent.appendChild(sourceTitle);
+                        sourceContent.appendChild(sourceUrl);
+
+                        sourceItem.appendChild(sourceNumber);
+                        sourceItem.appendChild(sourceContent);
+                        sourcesDiv.appendChild(sourceItem);
+                    });
+
+                    contentDiv.appendChild(sourcesDiv);
+                }
+
+                // 添加操作按钮
+                const actions = document.createElement('div');
+                actions.className = 'message-actions';
+                actions.innerHTML = `
+                    <button class="message-action" onclick="copyMessage(this)" title="复制">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                    </button>
+                    <button class="message-action" onclick="likeMessage(this)" title="点赞">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/>
+                        </svg>
+                    </button>
+                    <button class="message-action" onclick="dislikeMessage(this)" title="点踩">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/>
+                        </svg>
+                    </button>
+                `;
+                botMessage.appendChild(actions);
+            } catch (error) {
+                contentDiv.classList.remove('streaming');
+                contentDiv.textContent = '抱歉，生成回复时出错了。错误：' + error.message;
+            }
+
+            scrollChatToBottom();
+        }
+
+        async function sendWritingMessage() {
+            const message = writingInput.value.trim();
+            if (!message) return;
+
+            console.log('发送写作消息:', message);
+
+            writingInput.value = '';
+            writingCharCount.textContent = '0';
+        }
+
+        // ==================== DeepSeek API 调用 ====================
+        async function callDeepSeekAPI(userMessage, onChunk, messageElement) {
+            let searchSources = null; // 存储搜索来源
+
+            try {
+                const systemContent = isWebSearchEnabled
+                    ? '你是小金助手，一个专业的AI助手。当需要最新信息时，请主动使用web_search工具进行搜索。请以清晰的结构化格式回答，使用Markdown格式，包括标题、小标题和列表。在引用搜索结果时，请在相关内容后面标注引用序号（如<sup>1</sup>、<sup>2</sup>等）。'
+                    : '你是小金助手，一个专业的AI助手。请以清晰的结构化格式回答，使用Markdown格式。';
+
+                // 构建消息历史
+                const messages = [
+                    { role: 'system', content: systemContent },
+                    ...conversationHistory,
+                    { role: 'user', content: userMessage }
+                ];
+
+                // 调试信息：显示当前对话历史
+                console.log(`📊 多轮对话 - 当前轮数: ${Math.floor(conversationHistory.length / 2) + 1}`,
+                           `历史消息数: ${conversationHistory.length}`,
+                           `发送消息数: ${messages.length}`);
+
+                // 如果启用了联网搜索，添加工具
+                const tools = isWebSearchEnabled ? [
+                    {
+                        type: 'function',
+                        function: {
+                            name: 'web_search',
+                            description: '使用博查搜索引擎联网搜索最新信息',
+                            parameters: {
+                                type: 'object',
+                                properties: {
+                                    query: { type: 'string', description: '搜索关键词' },
+                                    count: { type: 'integer', description: '返回结果数量', default: 5 }
+                                },
+                                required: ['query']
+                            }
+                        }
+                    }
+                ] : undefined;
+
+                const requestBody = {
+                    model: currentModel,
+                    messages: messages,
+                    temperature: 0.7,
+                    max_tokens: 4000,
+                    stream: true
+                };
+
+                if (tools) {
+                    requestBody.tools = tools;
+                }
+
+                const response = await fetch(DEEPSEEK_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`API错误 ${response.status}: ${errorText}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullContent = '';
+                let reasoningContent = '';
+                let toolCalls = [];
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n').filter(line => line.trim());
+
+                    for (const line of lines) {
+                        if (!line.startsWith('data: ')) continue;
+                        const dataStr = line.substring(6);
+                        if (dataStr === '[DONE]') continue;
+
+                        try {
+                            const data = JSON.parse(dataStr);
+                            const delta = data.choices[0]?.delta;
+
+                            // 处理普通内容
+                            if (delta?.content) {
+                                fullContent += delta.content;
+                                onChunk(delta.content);
+                            }
+
+                            // 处理R1推理过程
+                            if (delta?.reasoning_content) {
+                                reasoningContent += delta.reasoning_content;
+                            }
+
+                            // 处理工具调用
+                            if (delta?.tool_calls) {
+                                for (const tc of delta.tool_calls) {
+                                    if (!toolCalls[tc.index]) {
+                                        toolCalls[tc.index] = {
+                                            id: tc.id || '',
+                                            type: 'function',
+                                            function: { name: '', arguments: '' }
+                                        };
+                                    }
+                                    if (tc.function?.name) toolCalls[tc.index].function.name = tc.function.name;
+                                    if (tc.function?.arguments) toolCalls[tc.index].function.arguments += tc.function.arguments;
+                                }
+                            }
+                        } catch (e) {
+                            console.error('解析错误:', e);
+                        }
+                    }
+                }
+
+                // 显示推理过程
+                if (reasoningContent && messageElement) {
+                    const reasoningDiv = document.createElement('div');
+                    reasoningDiv.className = 'reasoning-section';
+                    reasoningDiv.innerHTML = `
+                        <div class="reasoning-title" onclick="toggleReasoning(this)">
+                            <div class="reasoning-title-left">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
+                                </svg>
+                                R1推理过程
+                            </div>
+                            <span class="reasoning-toggle">▼</span>
+                        </div>
+                        <div class="reasoning-content">${escapeHtml(reasoningContent)}</div>
+                    `;
+                    messageElement.querySelector('.message-content').appendChild(reasoningDiv);
+                }
+
+                // 处理工具调用
+                if (toolCalls.length > 0) {
+                    console.log('🔧 检测到工具调用:', toolCalls.map(tc => tc.function.name).join(', '));
+
+                    for (const toolCall of toolCalls) {
+                        const toolName = toolCall.function.name;
+                        const toolArgs = JSON.parse(toolCall.function.arguments);
+
+                        if (toolName === 'web_search') {
+                            onChunk('\n\n🔍 正在联网搜索: ' + toolArgs.query + '...\n');
+                            const searchResult = await bochaWebSearch(toolArgs.query, toolArgs.count || 5);
+                            console.log('🔍 搜索结果:', searchResult);
+
+                            // 保存搜索来源
+                            if (searchResult && searchResult.results) {
+                                searchSources = searchResult.results;
+                            }
+
+                            onChunk('✅ 搜索完成，正在分析结果...\n\n');
+
+                            // 更新对话历史
+                            conversationHistory.push({ role: 'user', content: userMessage });
+                            conversationHistory.push({
+                                role: 'assistant',
+                                content: fullContent || null,
+                                tool_calls: toolCalls
+                            });
+                            conversationHistory.push({
+                                role: 'tool',
+                                tool_call_id: toolCall.id,
+                                content: JSON.stringify(searchResult)
+                            });
+
+                            // 重新调用API，让AI基于搜索结果生成回答
+                            const systemContent2 = '你是小金助手。现在你已经获得了搜索结果，请基于这些信息回答用户的问题。';
+                            const newMessages = [
+                                { role: 'system', content: systemContent2 },
+                                ...conversationHistory
+                            ];
+
+                            const response2 = await fetch(DEEPSEEK_API_URL, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                                },
+                                body: JSON.stringify({
+                                    model: currentModel,
+                                    messages: newMessages,
+                                    temperature: 0.7,
+                                    max_tokens: 4000,
+                                    stream: true
+                                })
+                            });
+
+                            if (!response2.ok) {
+                                throw new Error('工具调用后API请求失败');
+                            }
+
+                            const reader2 = response2.body.getReader();
+                            const decoder2 = new TextDecoder();
+                            let finalContent = '';
+
+                            while (true) {
+                                const { done, value } = await reader2.read();
+                                if (done) break;
+
+                                const chunk = decoder2.decode(value, { stream: true });
+                                const lines = chunk.split('\n').filter(line => line.trim());
+
+                                for (const line of lines) {
+                                    if (!line.startsWith('data: ')) continue;
+                                    const dataStr = line.substring(6);
+                                    if (dataStr === '[DONE]') continue;
+
+                                    try {
+                                        const data = JSON.parse(dataStr);
+                                        const delta = data.choices[0]?.delta;
+
+                                        if (delta?.content) {
+                                            finalContent += delta.content;
+                                            onChunk(delta.content);
+                                        }
+                                    } catch (e) {
+                                        console.error('解析错误:', e);
+                                    }
+                                }
+                            }
+
+                            // 更新最后一条助手消息
+                            conversationHistory[conversationHistory.length - 1] = {
+                                role: 'assistant',
+                                content: finalContent
+                            };
+
+                            console.log('✅ 工具调用完成，已生成最终回答');
+                            return { content: finalContent, sources: searchSources };
+                        }
+                    }
+                }
+
+                // 保存对话历史
+                conversationHistory.push(
+                    { role: 'user', content: userMessage },
+                    { role: 'assistant', content: fullContent }
+                );
+
+                console.log(`💾 已保存对话历史 - 总计: ${conversationHistory.length} 条消息, 对话轮数: ${conversationHistory.length / 2}`);
+
+                // 限制历史记录长度
+                if (conversationHistory.length > 20) {
+                    conversationHistory = conversationHistory.slice(-20);
+                    console.log('⚠️ 对话历史已达上限，保留最近20条消息');
+                }
+
+                return { content: fullContent, sources: searchSources };
+
+            } catch (error) {
+                console.error('API调用失败:', error);
+                throw error;
+            }
+        }
+
+        // ==================== 博查搜索API ====================
+        async function bochaWebSearch(query, count = 5) {
+            try {
+                console.log('🔍 执行博查搜索:', query);
+
+                // 尝试调用博查搜索API
+                try {
+                    const response = await fetch('https://api.bochaai.com/v1/web-search', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer sk-cfb4999e8fa847afa9e64286c8fb8292'
+                        },
+                        body: JSON.stringify({ query, count })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('✅ 博查搜索成功:', data);
+                        return data;
+                    } else {
+                        console.warn('⚠️ 博查API返回错误，使用模拟数据');
+                    }
+                } catch (apiError) {
+                    console.warn('⚠️ 博查API调用失败，使用模拟数据:', apiError.message);
+                }
+
+                // 返回更真实的模拟搜索结果
+                const mockResults = {
+                    query: query,
+                    results: [
+                        {
+                            title: `${query} - 最新信息`,
+                            url: 'https://www.example.com/search',
+                            snippet: `根据最新数据，${query}的相关信息如下：这是一个模拟的搜索结果，实际使用时需要配置博查搜索API密钥。`,
+                            publishedDate: new Date().toISOString()
+                        },
+                        {
+                            title: `${query} - 详细分析`,
+                            url: 'https://www.example.com/analysis',
+                            snippet: `关于${query}的深入分析和数据统计。提示：当前使用模拟搜索结果，请配置博查搜索API以获取真实数据。`,
+                            publishedDate: new Date().toISOString()
+                        }
+                    ],
+                    metadata: {
+                        totalResults: 2,
+                        searchTime: '0.15s',
+                        note: '⚠️ 当前为模拟数据，请配置博查搜索API以获取真实联网搜索结果'
+                    }
+                };
+
+                console.log('📦 返回模拟搜索结果:', mockResults);
+                return mockResults;
+            } catch (error) {
+                console.error('❌ 搜索失败:', error);
+                return {
+                    error: '搜索失败',
+                    query,
+                    results: [],
+                    errorMessage: error.message
+                };
+            }
+        }
+
+        // ==================== 聊天UI辅助函数 ====================
+
+        // 增强的内容渲染函数 - 添加源引用标记和模型说明
+        function renderEnhancedContent(content, sources = null) {
+            let enhancedContent = content;
+
+            // 如果有搜索来源,在内容中添加源引用标记
+            if (sources && sources.length > 0) {
+                // 在句子结尾或关键信息后添加源引用标记
+                // 这里采用简单策略:在段落末尾添加引用
+                const paragraphs = enhancedContent.split('\n\n');
+                const totalSources = sources.length;
+
+                // 为每个段落添加源引用(如果段落不为空)
+                enhancedContent = paragraphs.map((para, index) => {
+                    if (para.trim() && index > 0 && index <= totalSources) {
+                        // 在段落末尾添加源引用标记
+                        return para + ` <span class="source-ref">${index}</span>`;
+                    }
+                    return para;
+                }).join('\n\n');
+            }
+
+            // 渲染Markdown
+            const renderedHTML = marked.parse(enhancedContent);
+
+            return renderedHTML;
+        }
+
+        function appendChatMessage(role, content, sources = null) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${role}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${role}`;
+            avatar.textContent = role === 'user' ? '你' : 'J';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+
+            // 对于bot消息,使用Markdown渲染
+            if (role === 'bot' && content) {
+                try {
+                    contentDiv.innerHTML = marked.parse(content);
+                } catch (e) {
+                    console.error('Markdown渲染失败:', e);
+                    contentDiv.textContent = content;
+                }
+            } else {
+                contentDiv.textContent = content;
+            }
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(contentDiv);
+
+            // 如果有搜索来源,添加来源展示
+            if (sources && sources.length > 0) {
+                const sourcesDiv = document.createElement('div');
+                sourcesDiv.className = 'search-sources';
+
+                const sourcesTitle = document.createElement('div');
+                sourcesTitle.className = 'search-sources-title';
+                sourcesTitle.textContent = '🔍 搜索来源';
+                sourcesDiv.appendChild(sourcesTitle);
+
+                sources.forEach((source, index) => {
+                    const sourceItem = document.createElement('div');
+                    sourceItem.className = 'source-item';
+
+                    const sourceNumber = document.createElement('div');
+                    sourceNumber.className = 'source-number';
+                    sourceNumber.textContent = index + 1;
+
+                    const sourceContent = document.createElement('div');
+                    sourceContent.className = 'source-content';
+
+                    const sourceTitle = document.createElement('div');
+                    sourceTitle.className = 'source-title';
+                    sourceTitle.textContent = source.title || '无标题';
+
+                    const sourceUrl = document.createElement('div');
+                    sourceUrl.className = 'source-url';
+                    const sourceLink = document.createElement('a');
+                    sourceLink.className = 'source-link';
+                    sourceLink.href = source.url || '#';
+                    sourceLink.target = '_blank';
+                    sourceLink.textContent = source.url || '';
+                    sourceUrl.appendChild(sourceLink);
+
+                    sourceContent.appendChild(sourceTitle);
+                    sourceContent.appendChild(sourceUrl);
+
+                    sourceItem.appendChild(sourceNumber);
+                    sourceItem.appendChild(sourceContent);
+                    sourcesDiv.appendChild(sourceItem);
+                });
+
+                contentDiv.appendChild(sourcesDiv);
+            }
+
+            chatMessages.appendChild(messageDiv);
+
+            return messageDiv;
+        }
+
+        function scrollChatToBottom() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function copyMessage(btn) {
+            const content = btn.closest('.chat-message').querySelector('.message-content').textContent;
+            navigator.clipboard.writeText(content);
+            btn.textContent = '已复制';
+            setTimeout(() => btn.textContent = '复制', 2000);
+        }
+
+        function regenerateMessage() {
+            // TODO: 实现重新生成功能
+            alert('重新生成功能开发中');
+        }
+
+        function toggleReasoning(titleElement) {
+            const contentDiv = titleElement.nextElementSibling;
+            const toggleIcon = titleElement.querySelector('.reasoning-toggle');
+
+            contentDiv.classList.toggle('collapsed');
+            toggleIcon.classList.toggle('collapsed');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ==================== 新对话 ====================
+        function createNewChat() {
+            homeInput.value = '';
+            writingInput.value = '';
+            homeCharCount.textContent = '0';
+            writingCharCount.textContent = '0';
+
+            // 清空聊天记录
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            chatMessages.classList.remove('active');
+            conversationHistory = [];
+
+            // 返回首页，取消所有导航高亮
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('homePage').classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            currentPage = 'home';
+        }
+
+        // ==================== 工具栏标签切换 ====================
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // ==================== 信息来源选择监听 ====================
+        const sourceSelect = document.getElementById('sourceSelect');
+        if (sourceSelect) {
+            sourceSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'file') {
+                    openFileModal();
+                }
+            });
+        }
+
+        // ==================== 文件选择弹窗功能 ====================
+        function openFileModal() {
+            document.getElementById('fileModal').classList.add('active');
+
+            if (selectedFilesData.count > 0) {
+                if (selectedFilesData.type === 'upload') {
+                    switchModalTab('upload');
+                } else {
+                    switchModalTab('knowledge');
+                }
+            }
+        }
+
+        function closeFileModal() {
+            document.getElementById('fileModal').classList.remove('active');
+
+            if (sourceSelect && sourceSelect.value === 'file' && selectedFilesData.count === 0) {
+                sourceSelect.value = 'none';
+            }
+        }
+
+        function switchModalTab(tab) {
+            document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(tab === 'upload' ? 'uploadPanel' : 'knowledgePanel').classList.add('active');
+
+            updateSelectedCount();
+        }
+
+        // 上传文件相关
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadedFilesDiv = document.getElementById('uploadedFiles');
+
+        if (uploadArea && fileInput) {
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+
+        function handleFiles(files) {
+            const remainingSlots = 50 - uploadedFiles.length;
+            const filesToAdd = Array.from(files).slice(0, remainingSlots);
+
+            filesToAdd.forEach(file => {
+                uploadedFiles.push(file);
+                addFileToList(file);
+            });
+
+            document.getElementById('uploadCount').textContent = uploadedFiles.length;
+            updateSelectedCount();
+
+            if (uploadedFiles.length >= 50) {
+                uploadArea.style.opacity = '0.5';
+                uploadArea.style.pointerEvents = 'none';
+            }
+        }
+
+        function addFileToList(file) {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <div class="file-info">
+                    <div class="file-icon">📄</div>
+                    <div class="file-details">
+                        <div class="file-name">${escapeHtml(file.name)}</div>
+                        <div class="file-size">${formatFileSize(file.size)}</div>
+                    </div>
+                </div>
+                <button class="file-remove" onclick="removeFile('${escapeHtml(file.name)}')">删除</button>
+            `;
+            uploadedFilesDiv.appendChild(fileItem);
+        }
+
+        function removeFile(fileName) {
+            uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
+            document.getElementById('uploadCount').textContent = uploadedFiles.length;
+
+            const fileItems = uploadedFilesDiv.querySelectorAll('.file-item');
+            fileItems.forEach(item => {
+                if (item.querySelector('.file-name').textContent === fileName) {
+                    item.remove();
+                }
+            });
+
+            if (uploadedFiles.length < 50) {
+                uploadArea.style.opacity = '1';
+                uploadArea.style.pointerEvents = 'auto';
+            }
+
+            updateSelectedCount();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // 知识库文件夹功能
+        function toggleFolder(folderId) {
+            const toggle = document.getElementById(`toggle-${folderId}`);
+            const children = document.getElementById(`folder-${folderId}`);
+
+            if (children.classList.contains('expanded')) {
+                children.classList.remove('expanded');
+                toggle.classList.remove('expanded');
+            } else {
+                children.classList.add('expanded');
+                toggle.classList.add('expanded');
+            }
+        }
+
+        function checkFolder(folderId) {
+            const checkbox = document.getElementById(`check-${folderId}`);
+            const children = document.getElementById(`folder-${folderId}`);
+            const childCheckboxes = children.querySelectorAll('input[type="checkbox"]');
+
+            childCheckboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+                const docId = cb.id.replace('check-', '');
+                if (checkbox.checked) {
+                    selectedKnowledgeFiles.add(docId);
+                } else {
+                    selectedKnowledgeFiles.delete(docId);
+                }
+            });
+
+            updateSelectedCount();
+        }
+
+        function toggleDocument(docId) {
+            const checkbox = document.getElementById(`check-${docId}`);
+            checkbox.checked = !checkbox.checked;
+
+            if (checkbox.checked) {
+                selectedKnowledgeFiles.add(docId);
+            } else {
+                selectedKnowledgeFiles.delete(docId);
+            }
+
+            updateSelectedCount();
+        }
+
+        function selectAllKnowledge() {
+            const allCheckboxes = document.querySelectorAll('#folderTree input[type="checkbox"]');
+            const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+
+            allCheckboxes.forEach(cb => {
+                cb.checked = !allChecked;
+                const id = cb.id.replace('check-', '');
+                if (!allChecked) {
+                    selectedKnowledgeFiles.add(id);
+                } else {
+                    selectedKnowledgeFiles.delete(id);
+                }
+            });
+
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const currentTab = document.querySelector('.modal-tab.active')?.dataset.tab;
+            let count = 0;
+
+            if (currentTab === 'upload') {
+                count = uploadedFiles.length;
+            } else {
+                count = selectedKnowledgeFiles.size;
+            }
+
+            const selectedCountSpan = document.getElementById('selectedCount');
+            if (selectedCountSpan) {
+                selectedCountSpan.textContent = count;
+            }
+        }
+
+        function confirmFileSelection() {
+            const currentTab = document.querySelector('.modal-tab.active')?.dataset.tab;
+
+            if (currentTab === 'upload') {
+                selectedFilesData.type = 'upload';
+                selectedFilesData.files = uploadedFiles.map(f => f.name);
+                selectedFilesData.count = uploadedFiles.length;
+                console.log('已选择上传文件:', uploadedFiles);
+            } else {
+                selectedFilesData.type = 'knowledge';
+                const selectedFiles = [];
+                selectedKnowledgeFiles.forEach(fileId => {
+                    const checkbox = document.getElementById(`check-${fileId}`);
+                    if (checkbox && checkbox.checked) {
+                        const docItem = checkbox.closest('.document-item');
+                        if (docItem) {
+                            const fileName = docItem.querySelector('.document-name').textContent;
+                            selectedFiles.push(fileName);
+                        }
+                    }
+                });
+                selectedFilesData.files = selectedFiles;
+                selectedFilesData.count = selectedFiles.length;
+                console.log('已选择知识库文件:', selectedFiles);
+            }
+
+            updateFileStatusBadge();
+            closeFileModal();
+        }
+
+        function updateFileStatusBadge() {
+            const badge = document.getElementById('fileStatusBadge');
+            if (!badge) return;
+
+            if (selectedFilesData.count > 0) {
+                badge.style.display = 'inline-flex';
+                badge.className = 'file-status-badge';
+                badge.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                    </svg>
+                    <span>${selectedFilesData.count} 个文件</span>
+                    <span class="close-icon" onclick="clearSelectedFiles(event)">×</span>
+                `;
+                badge.title = '点击编辑已选择的文件 | 右侧×清除';
+                badge.onclick = (e) => {
+                    if (!e.target.classList.contains('close-icon')) {
+                        openFileModal();
+                    }
+                };
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function clearSelectedFiles(event) {
+            event.stopPropagation();
+            if (confirm('确定要清除所有已选择的文件吗？')) {
+                selectedFilesData = {
+                    type: null,
+                    files: [],
+                    count: 0
+                };
+                uploadedFiles = [];
+                selectedKnowledgeFiles.clear();
+                document.getElementById('uploadedFiles').innerHTML = '';
+                document.getElementById('uploadCount').textContent = '0';
+
+                document.querySelectorAll('#folderTree input[type="checkbox"]').forEach(cb => {
+                    cb.checked = false;
+                });
+
+                updateFileStatusBadge();
+
+                if (sourceSelect) {
+                    sourceSelect.value = 'none';
+                }
+            }
+        }
+
+        function filterKnowledgeFiles(searchText) {
+            const normalizedSearch = searchText.toLowerCase().trim();
+            const allDocuments = document.querySelectorAll('.document-item');
+            const folders = document.querySelectorAll('.folder-item');
+
+            if (!normalizedSearch) {
+                allDocuments.forEach(doc => {
+                    doc.classList.remove('hidden');
+                    const nameSpan = doc.querySelector('.document-name');
+                    nameSpan.innerHTML = nameSpan.textContent;
+                });
+
+                folders.forEach(folder => {
+                    folder.classList.remove('hidden');
+                });
+
+                return;
+            }
+
+            allDocuments.forEach(doc => {
+                const nameSpan = doc.querySelector('.document-name');
+                const fileName = nameSpan.textContent.toLowerCase();
+
+                if (fileName.includes(normalizedSearch)) {
+                    doc.classList.remove('hidden');
+                    const originalText = nameSpan.textContent;
+                    const regex = new RegExp(`(${escapeRegExp(searchText)})`, 'gi');
+                    const highlightedText = originalText.replace(regex, '<span class="highlight">$1</span>');
+                    nameSpan.innerHTML = highlightedText;
+                } else {
+                    doc.classList.add('hidden');
+                    nameSpan.innerHTML = nameSpan.textContent;
+                }
+            });
+
+            folders.forEach(folder => {
+                const folderId = folder.querySelector('.folder-header').getAttribute('onclick').match(/'([^']+)'/)[1];
+                const children = document.getElementById(`folder-${folderId}`);
+                const visibleDocs = children.querySelectorAll('.document-item:not(.hidden)');
+
+                if (visibleDocs.length > 0) {
+                    folder.classList.remove('hidden');
+                    children.classList.add('expanded');
+                    document.getElementById(`toggle-${folderId}`).classList.add('expanded');
+                } else {
+                    folder.classList.add('hidden');
+                }
+            });
+        }
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+    </script>
+</body>
+</html>

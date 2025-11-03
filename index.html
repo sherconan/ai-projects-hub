@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI项目管理中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--card-color, #5470ff), var(--card-color-light, #667eea));
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .project-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .project-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .project-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .project-version {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f0f0f0;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .project-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            background: rgba(84, 112, 255, 0.1);
+            color: #5470ff;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .project-features {
+            margin-bottom: 20px;
+        }
+
+        .project-features-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-item {
+            font-size: 13px;
+            color: #666;
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .feature-item::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--card-color, #5470ff);
+            font-weight: bold;
+        }
+
+        .launch-button {
+            width: 100%;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--card-color, #5470ff), var(--card-color-light, #667eea));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .launch-button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(84, 112, 255, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            margin-top: 40px;
+        }
+
+        .add-project {
+            background: rgba(255,255,255,0.2);
+            border: 2px dashed rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            min-height: 300px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .add-project:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.8);
+        }
+
+        .add-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 AI项目管理中心</h1>
+            <p>快速访问和管理您的所有AI项目</p>
+        </div>
+
+        <div class="projects-grid" id="projectsGrid">
+            <!-- 项目卡片将通过JavaScript动态加载 -->
+        </div>
+
+        <div class="footer">
+            <p>Powered by DeepSeek AI & Claude Code</p>
+        </div>
+    </div>
+
+    <script>
+        // 项目配置
+        const projects = [
+            {
+                id: 'xiaojin-platform',
+                name: '小金智能助手',
+                description: '黄金价格查询与智能分析助手,集成DeepSeek AI和博查搜索',
+                version: '1.0.0',
+                icon: '💰',
+                color: '#FFD700',
+                colorLight: '#FFA500',
+                tags: ['AI助手', '黄金价格', '智能分析'],
+                path: 'projects/xiaojin-platform/index.html',
+                features: [
+                    '黄金价格实时查询',
+                    'DeepSeek AI 智能对话',
+                    '博查搜索联网功能',
+                    'R1推理过程展示'
+                ]
+            },
+            {
+                id: 'ai-capabilities-hub',
+                name: '九章智启 AI开发平台',
+                description: '集成多种AI能力的综合开发平台,支持对话、搜索、代码生成等功能',
+                version: '1.0.0',
+                icon: '🤖',
+                color: '#5470ff',
+                colorLight: '#667eea',
+                tags: ['AI平台', '开发工具', '多功能'],
+                path: 'projects/ai-capabilities-hub/index.html',
+                features: [
+                    'DeepSeek AI模型集成',
+                    '博查搜索联网',
+                    '智能对话功能',
+                    '丰富的平台能力展示'
+                ]
+            }
+        ];
+
+        // 渲染项目卡片
+        function renderProjects() {
+            const grid = document.getElementById('projectsGrid');
+
+            projects.forEach(project => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                card.style.setProperty('--card-color', project.color);
+                card.style.setProperty('--card-color-light', project.colorLight);
+
+                card.innerHTML = `
+                    <div class="project-icon">${project.icon}</div>
+                    <div class="project-header">
+                        <div>
+                            <div class="project-name">${project.name}</div>
+                            <span class="project-version">v${project.version}</span>
+                        </div>
+                    </div>
+                    <div class="project-description">${project.description}</div>
+                    <div class="project-tags">
+                        ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <div class="project-features">
+                        <div class="project-features-title">核心功能</div>
+                        <ul class="feature-list">
+                            ${project.features.map(feature => `<li class="feature-item">${feature}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <button class="launch-button" onclick="launchProject('${project.path}')">
+                        启动项目 →
+                    </button>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            // 添加"添加新项目"卡片
+            const addCard = document.createElement('div');
+            addCard.className = 'project-card add-project';
+            addCard.innerHTML = `
+                <div class="add-icon">+</div>
+                <div>添加新项目</div>
+            `;
+            addCard.onclick = () => alert('项目添加功能开发中...\n\n提示: 在 projects 目录下创建新文件夹并添加 index.html 和 config.json 文件');
+            grid.appendChild(addCard);
+        }
+
+        // 启动项目
+        function launchProject(path) {
+            window.location.href = path;
+        }
+
+        // 页面加载时渲染项目
+        renderProjects();
+    </script>
+</body>
+</html>
