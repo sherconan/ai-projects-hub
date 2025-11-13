@@ -23,22 +23,77 @@
         .container {
             display: flex;
             height: 100vh;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
         }
 
         /* ========== 左侧边栏 ========== */
         .sidebar {
-            width: 196px;
+            flex: 0 0 260px;
             background: #ebebeb;
             display: flex;
             flex-direction: column;
-            flex-shrink: 0;
+            transition: flex 0.3s ease;
+            min-width: 260px;
+        }
+
+        .sidebar.collapsed {
+            flex: 0 0 72px;
+            min-width: 72px;
+        }
+
+        .sidebar.collapsed .logo,
+        .sidebar.collapsed .new-chat,
+        .sidebar.collapsed .history-section,
+        .sidebar.collapsed .sidebar-footer {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 10px;
+            font-size: 0;
+            position: relative;
+        }
+
+        .sidebar.collapsed .nav-item img,
+        .sidebar.collapsed .nav-item svg {
+            font-size: 16px;
+        }
+
+        .sidebar.collapsed .nav-item::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 12px;
+            padding: 6px 12px;
+            background: #333;
+            color: white;
+            font-size: 13px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed .nav-item:hover::after {
+            opacity: 1;
         }
 
         .sidebar-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 14px 12px;
+            padding: 14px 16px;
             height: 60px;
         }
 
@@ -46,6 +101,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            padding-left: 4px;
         }
 
         .logo-icon {
@@ -83,8 +139,8 @@
         }
 
         .new-chat {
-            margin: 8px 12px 12px;
-            padding: 8px 12px;
+            margin: 8px 16px 12px;
+            padding: 8px 20px;
             background: linear-gradient(90deg, #6b7bf6 0%, #8b7ce6 100%);
             border: none;
             color: white;
@@ -93,6 +149,9 @@
             text-align: left;
             border-radius: 6px;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .new-chat:hover {
@@ -100,17 +159,22 @@
             box-shadow: 0 2px 8px rgba(107, 123, 246, 0.3);
         }
 
+        .new-chat.active {
+            box-shadow: 0 2px 12px rgba(107, 123, 246, 0.5);
+            transform: translateY(-1px);
+        }
+
         .sidebar-nav {
             flex: 1;
             overflow-y: auto;
-            padding: 0 12px;
+            padding: 0 16px;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 12px;
+            padding: 8px 20px;
             margin-bottom: 4px;
             border-radius: 8px;
             font-size: 13px;
@@ -209,6 +273,8 @@
             display: flex;
             flex-direction: column;
             background: white;
+            min-width: 0;
+            overflow: hidden;
         }
 
         /* 品牌信息（在首页中间显示）*/
@@ -242,10 +308,29 @@
             display: none;
             flex: 1;
             overflow-y: auto;
+            min-width: 0;
         }
 
         .page.active {
             display: flex;
+            min-width: 0;
+        }
+
+        /* 确保非活动页面完全不可见 */
+        .page:not(.active) {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* 确保定时任务页面完全覆盖默认页面样式 */
+        #schedulePage.page {
+            overflow: hidden !important;
+        }
+
+        #schedulePage.page.active {
+            display: flex !important;
         }
 
         /* ========== 首页样式 ========== */
@@ -264,8 +349,8 @@
         }
 
         .home-input-container {
-            width: 100%;
-            max-width: 720px;
+            width: 90%;
+            max-width: 800px;
             background: white;
             border: 1px solid #e5e5e5;
             border-radius: 12px;
@@ -366,7 +451,7 @@
             padding: 6px 12px;
             border: 1px solid #e0e0e0;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             color: #666;
             cursor: pointer;
             transition: all 0.2s;
@@ -394,7 +479,8 @@
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
-            max-width: 720px;
+            width: 90%;
+            max-width: 800px;
             justify-content: center;
         }
 
@@ -404,7 +490,7 @@
             border: 1px solid;
             background: white;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
             transition: all 0.2s;
             white-space: nowrap;
         }
@@ -456,6 +542,13 @@
             font-size: 12px;
             color: #999;
             border-top: 1px solid #f0f0f0;
+            position: relative;
+            width: 100%;
+        }
+
+        /* 确保页脚只在其父page内显示 */
+        .page:not(.active) .page-footer {
+            display: none !important;
         }
 
         /* 智能写作页面样式（保持之前的样式）*/
@@ -470,7 +563,7 @@
         }
 
         .writing-inner {
-            max-width: 780px;
+            max-width: 90%;
             margin: 0 auto;
         }
 
@@ -1499,6 +1592,1053 @@
             border-radius: 3px;
         }
 
+        /* ========== 定时任务页面样式 ========== */
+        #schedulePage {
+            flex-direction: row !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            position: relative;
+            min-width: 0;
+        }
+
+        .task-list-panel {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+            background: #fff;
+            border-right: 1px solid #e8e8e8;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 0;
+        }
+
+        .task-list-panel.detail-open {
+            flex: 0 0 40%;
+            min-width: 350px;
+        }
+
+        .task-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .task-list-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .new-task-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            background: linear-gradient(135deg, #7c6bf6 0%, #9580e6 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .new-task-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 107, 246, 0.25);
+        }
+
+        .task-section {
+            margin-bottom: 32px;
+        }
+
+        .task-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .task-item {
+            padding: 14px 16px;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            position: relative;
+        }
+
+        .task-item:hover {
+            background: #f8f9ff;
+            border-color: #7c6bf6;
+        }
+
+        .task-item:hover .task-item-actions {
+            opacity: 1;
+        }
+
+        .task-item.active {
+            background: #f0f2ff;
+            border-color: #7c6bf6;
+            box-shadow: 0 2px 8px rgba(124, 107, 246, 0.15);
+        }
+
+        .task-item-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-item-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+        }
+
+        .task-item-preview {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .task-item-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            min-width: 140px;
+            position: relative;
+            transition: opacity 0.2s;
+        }
+
+        .task-item:hover .task-item-meta {
+            opacity: 0;
+        }
+
+        .task-item-cycle {
+            font-size: 12px;
+            color: #888;
+            white-space: nowrap;
+        }
+
+        .task-item-last-run {
+            font-size: 11px;
+            color: #999;
+            white-space: nowrap;
+        }
+
+        .task-item-actions {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .task-item:hover .task-item-actions {
+            pointer-events: auto;
+        }
+
+        .task-item-actions button {
+            padding: 6px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e8e8e8;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .task-item-actions button:hover {
+            border-color: #7c6bf6;
+            color: #7c6bf6;
+        }
+
+        .task-item-actions .delete-btn:hover {
+            background: #fff5f5;
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+
+        .task-detail-panel {
+            flex: 0 0 0;
+            background: #fafafa;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: flex 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+            min-width: 0;
+        }
+
+        .task-detail-panel.active {
+            flex: 1 1 60%;
+            min-width: 450px;
+            max-width: 100%;
+        }
+
+        .task-detail-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* ========== 日历组件样式 ========== */
+        .calendar-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .calendar-container {
+            background: white;
+            border-radius: 12px;
+            width: 320px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .calendar-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #7c6bf6 0%, #9580e6 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calendar-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .calendar-nav button {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            color: white;
+        }
+
+        .calendar-nav button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .calendar-month-year {
+            font-size: 15px;
+            font-weight: 500;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 12px 16px 8px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            padding: 4px 0;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 8px 12px 12px;
+            gap: 4px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #333;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .calendar-day:hover:not(.other-month) {
+            background: #f5f5f5;
+            transform: scale(1.05);
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+            cursor: default;
+        }
+
+        .calendar-day.other-month:hover {
+            background: transparent;
+            transform: none;
+        }
+
+        .calendar-day.today {
+            background: #f0f0f0;
+            font-weight: 600;
+            border-color: #7c6bf6;
+        }
+
+        .calendar-day.today.selected {
+            background: linear-gradient(135deg, #7c6bf6 0%, #9580e6 100%) !important;
+        }
+
+        .calendar-day.selected {
+            background: linear-gradient(135deg, #7c6bf6 0%, #9580e6 100%) !important;
+            color: white !important;
+            font-weight: 700 !important;
+            box-shadow: 0 6px 16px rgba(124, 107, 246, 0.5) !important;
+            transform: scale(1.15) !important;
+            border-color: #5a4dd4 !important;
+            border-width: 3px !important;
+            z-index: 10;
+            animation: selectPulse 0.3s ease-out;
+            opacity: 1 !important;
+        }
+
+        @keyframes selectPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1.15); }
+        }
+
+        .calendar-day.selected:hover {
+            transform: scale(1.15);
+            box-shadow: 0 8px 20px rgba(124, 107, 246, 0.6);
+        }
+
+        .calendar-day.has-data {
+            cursor: pointer;
+        }
+
+        .calendar-day.no-data {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .calendar-day.selected.no-data {
+            opacity: 1 !important;
+        }
+
+        .calendar-day.has-data::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: #7c6bf6;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .calendar-day.has-data:hover::after {
+            width: 6px;
+            height: 6px;
+            bottom: 3px;
+        }
+
+        .calendar-day.selected.has-data::after {
+            background: white;
+            width: 5px;
+            height: 5px;
+        }
+
+        .calendar-day:active:not(.other-month) {
+            transform: scale(0.95);
+        }
+
+        .calendar-footer {
+            padding: 12px 16px;
+            border-top: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calendar-footer button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calendar-footer .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .calendar-footer .btn-cancel:hover {
+            background: #e8e8e8;
+        }
+
+        .calendar-footer .btn-confirm {
+            background: linear-gradient(135deg, #7c6bf6 0%, #9580e6 100%);
+            color: white;
+        }
+
+        .calendar-footer .btn-confirm:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(124, 107, 246, 0.3);
+        }
+
+        /* ========== 创建任务弹窗样式 ========== */
+        .create-task-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .create-task-container {
+            background: white;
+            border-radius: 12px;
+            width: 580px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .create-task-header {
+            padding: 24px 28px 20px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .create-task-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .create-task-header .close-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            color: #666;
+        }
+
+        .create-task-header .close-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .create-task-body {
+            padding: 24px 28px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #7c6bf6;
+            box-shadow: 0 0 0 3px rgba(124, 107, 246, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #999;
+        }
+
+        .form-textarea {
+            min-height: 160px;
+            resize: vertical;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .frequency-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .frequency-tab {
+            padding: 8px 18px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .frequency-tab:hover {
+            border-color: #7c6bf6;
+            color: #7c6bf6;
+        }
+
+        .frequency-tab.active {
+            background: #f5f0ff;
+            border-color: #7c6bf6;
+            color: #7c6bf6;
+            font-weight: 500;
+        }
+
+        .schedule-row {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .schedule-field {
+            flex: 1;
+        }
+
+        .schedule-field label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .schedule-field input,
+        .schedule-field select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .schedule-field input:focus,
+        .schedule-field select:focus {
+            outline: none;
+            border-color: #7c6bf6;
+            box-shadow: 0 0 0 3px rgba(124, 107, 246, 0.1);
+        }
+
+        .weekday-selector {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .weekday-checkbox {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .weekday-checkbox input[type="checkbox"] {
+            display: none;
+        }
+
+        .weekday-checkbox span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .weekday-checkbox:hover span {
+            border-color: #7c6bf6;
+            color: #7c6bf6;
+        }
+
+        .weekday-checkbox input[type="checkbox"]:checked + span {
+            background: #7c6bf6;
+            border-color: #7c6bf6;
+            color: white;
+            font-weight: 500;
+        }
+
+        .expert-mode {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .expert-mode:hover {
+            background: #f0f0f0;
+        }
+
+        .expert-mode input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .expert-mode label {
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .create-task-footer {
+            padding: 16px 28px;
+            border-top: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .task-limit-info {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .task-limit-info .limit-count {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .create-task-footer .btn-create {
+            padding: 10px 28px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .create-task-footer .btn-create:hover {
+            background: #333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .create-task-footer .btn-create:active {
+            transform: translateY(0);
+        }
+
+        .task-detail-header {
+            padding: 20px 32px;
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .task-detail-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .task-detail-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .task-detail-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .task-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .task-schedule-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .task-schedule-badge svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .task-detail-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .task-action-btn {
+            padding: 6px 12px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .task-action-btn:hover {
+            background: #f8f8f8;
+            border-color: #ccc;
+        }
+
+        .task-action-btn.primary {
+            background: #fff;
+            color: #1a1a1a;
+            border: 1px solid #ddd;
+        }
+
+        .task-action-btn.primary:hover {
+            background: #f5f5f5;
+        }
+
+        .task-action-btn#deleteTaskBtn:hover {
+            background: #fff5f5;
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #666;
+        }
+
+        .icon-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .task-detail-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 32px;
+        }
+
+        .task-detail-section {
+            margin-bottom: 32px;
+        }
+
+        .task-detail-section h3 {
+            font-size: 11px;
+            font-weight: 600;
+            color: #999;
+            margin: 0 0 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .task-prompt-box {
+            padding: 10px 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #666;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .result-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #e8e8e8;
+            margin-bottom: 20px;
+        }
+
+        .result-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .result-nav-arrows {
+            display: flex;
+            gap: 4px;
+        }
+
+        .result-nav-arrows button {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #666;
+        }
+
+        .result-nav-arrows button:hover {
+            background: #f5f5f5;
+            border-color: #ccc;
+        }
+
+        .result-nav-arrows button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .result-title-info {
+            flex: 1;
+        }
+
+        .result-title-main {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .result-title-meta {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .result-nav-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .result-nav-btn {
+            padding: 6px 12px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .result-nav-btn:hover {
+            background: #e8e8e8;
+        }
+
+        .thinking-time {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 0;
+            font-size: 13px;
+            color: #666;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 20px;
+        }
+
+        .thinking-time svg {
+            width: 16px;
+            height: 16px;
+            color: #f59e0b;
+        }
+
+        .report-content {
+            padding-bottom: 20px;
+        }
+
+        .report-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 16px 0;
+        }
+
+        .report-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .report-list-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .report-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .report-item-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .report-item-content {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .report-item-source {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #888;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .report-item-source:hover {
+            background: #e8e8e8;
+        }
+
+        .expand-more-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .expand-more-btn:hover {
+            background: #f0f0f0;
+            border-color: #ccc;
+        }
+
         /* 隐藏类 */
         .hidden {
             display: none !important;
@@ -1514,57 +2654,60 @@
                     <div class="logo-icon">J</div>
                     <span class="logo-text">小金助手</span>
                 </div>
-                <div class="toggle-btn">
+                <div class="toggle-btn" onclick="toggleSidebar()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M3 18h13v-2H3v2zm0-5h10v-2H3v2zm0-7v2h13V6H3zm18 9.59L17.42 12 21 8.41 19.59 7l-5 5 5 5L21 15.59z"/>
                     </svg>
                 </div>
             </div>
 
-            <button class="new-chat" onclick="createNewChat()">+ 新对话</button>
+            <button class="new-chat" onclick="createNewChat()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink: 0;">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+                新对话
+            </button>
 
             <div class="sidebar-nav">
-                <div class="nav-item" data-page="writing">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                    </svg>
+                <div class="nav-item" data-page="writing" data-tooltip="智能写作">
+                    <img src="images/编辑撰写_writing-fluently@3x.png" width="16" height="16" style="display: inline-block; vertical-align: middle;">
                     智能写作
                 </div>
-                <div class="nav-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
-                    </svg>
+                <div class="nav-item" data-tooltip="数字法律合规营">
+                    <img src="images/falvfagui@3x.png" width="16" height="16" style="display: inline-block; vertical-align: middle;">
                     数字法律合规营
                 </div>
-                <div class="nav-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
-                    </svg>
+                <div class="nav-item" data-tooltip="每日市场动态">
+                    <img src="images/xiaoshoudongtai@3x.png" width="16" height="16" style="display: inline-block; vertical-align: middle;">
                     每日市场动态
                 </div>
-                <div class="nav-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
-                    </svg>
-                    中金智问
+                <div class="nav-item" data-tooltip="中金智阅">
+                    <img src="images/Arengongzhineng-01@3x.png" width="16" height="16" style="display: inline-block; vertical-align: middle;">
+                    中金智阅
                 </div>
-                <div class="nav-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
-                    </svg>
+                <div class="nav-item" data-tooltip="中金智译">
+                    <img src="images/fanyi@3x.png" width="16" height="16" style="display: inline-block; vertical-align: middle;">
                     中金智译
+                </div>
+                <div class="nav-item" data-tooltip="J-Agent">
+                    <img src="images/Arengongzhineng-01@3x.png" width="16" height="16" style="display: inline-block; vertical-align: middle;">
+                    J-Agent
+                </div>
+                <div class="nav-item" data-page="hr-agent" data-tooltip="HR-Agent">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle;">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    HR-Agent
                 </div>
 
                 <!-- 特殊功能区分隔线 -->
                 <div class="nav-separator"></div>
 
-                <div class="nav-item special-function">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>
-                    </svg>
+                <div class="nav-item special-function" data-tooltip="个人知识库">
+                    <img src="images/书籍1_book-one@3x.png" width="16" height="16" style="display: inline-block; vertical-align: middle;">
                     个人知识库
                 </div>
-                <div class="nav-item special-function">
+                <div class="nav-item special-function" data-page="schedule" data-tooltip="定时任务">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
                     </svg>
@@ -1600,21 +2743,15 @@
 
                     <div class="feature-toggles" style="margin-bottom: 8px;">
                         <button class="feature-toggle active" onclick="toggleDeepThink()" title="启用DeepSeek R1深度推理模型">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
-                            </svg>
+                            <img src="images/shendusikao@3x.png" width="18" height="18" style="display: inline-block; vertical-align: middle;">
                             <span>深度思考(R1)</span>
                         </button>
                         <button class="feature-toggle" onclick="toggleWebSearch()" title="开启后可联网搜索实时信息">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                            </svg>
+                            <img src="images/hulianwang@3x.png" width="18" height="18" style="display: inline-block; vertical-align: middle;">
                             联网搜索
                         </button>
                         <button class="feature-toggle" onclick="toggleKnowledge()" title="启用个人知识库搜索">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>
-                            </svg>
+                            <img src="images/搜索_search@3x.png" width="18" height="18" style="display: inline-block; vertical-align: middle;">
                             知识库搜索
                         </button>
                     </div>
@@ -1666,21 +2803,15 @@
 
                     <div class="feature-toggles">
                         <button class="feature-toggle active" id="deepThinkToggle" onclick="toggleDeepThink()" title="启用DeepSeek R1深度推理模型">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
-                            </svg>
+                            <img src="images/shendusikao@3x.png" width="18" height="18" style="display: inline-block; vertical-align: middle;">
                             <span id="deepThinkLabel">深度思考(R1)</span>
                         </button>
                         <button class="feature-toggle" id="webSearchToggle" onclick="toggleWebSearch()" title="开启后可联网搜索实时信息（如天气、新闻等）">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                            </svg>
+                            <img src="images/hulianwang@3x.png" width="18" height="18" style="display: inline-block; vertical-align: middle;">
                             联网搜索
                         </button>
                         <button class="feature-toggle" id="knowledgeToggle" onclick="toggleKnowledge()" title="启用个人知识库搜索">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>
-                            </svg>
+                            <img src="images/搜索_search@3x.png" width="18" height="18" style="display: inline-block; vertical-align: middle;">
                             知识库搜索
                         </button>
                     </div>
@@ -1725,6 +2856,9 @@
                     </button>
                     <button class="shortcut-btn orange">
                         中金智译 <strong>文件、文本智能翻译</strong>
+                    </button>
+                    <button class="shortcut-btn blue" onclick="navigateTo('hr-agent')">
+                        HR-Agent <strong>智能人力资源助手</strong>
                     </button>
                 </div>
 
@@ -1868,13 +3002,329 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="page-footer">
+                    内容由DeepSeek-R1系列模型生成，请根据使者考...
+                </div>
             </div>
 
-            <div class="page-footer">
-                内容由DeepSeek-R1系列模型生成，请根据使者考...
+            <!-- 定时任务页面 -->
+            <div class="page" id="schedulePage">
+            <!-- 左侧任务列表 -->
+            <div class="task-list-panel">
+                <div class="task-list-header">
+                    <h1>任务</h1>
+                    <button class="new-task-btn" onclick="createNewTask()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        创建任务
+                    </button>
+                </div>
+
+                <div class="task-list">
+                    <div class="task-item" onclick="openTaskDetail('task1')">
+                        <div class="task-item-main">
+                            <h3 class="task-item-title">每日科技简报</h3>
+                            <div class="task-item-preview">OpenAI releases safety models</div>
+                        </div>
+                        <div class="task-item-meta">
+                            <div class="task-item-cycle">每日 15:40</div>
+                            <div class="task-item-last-run">上次执行: 11分钟前</div>
+                        </div>
+                        <div class="task-item-actions">
+                            <button onclick="event.stopPropagation(); editTask('task1');" title="编辑">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </button>
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteTask('task1');" title="删除">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="task-item" onclick="openTaskDetail('task2')">
+                        <div class="task-item-main">
+                            <h3 class="task-item-title">效率提升</h3>
+                            <div class="task-item-preview">2分钟法则 - 立即行动</div>
+                        </div>
+                        <div class="task-item-meta">
+                            <div class="task-item-cycle">每日 11:39</div>
+                            <div class="task-item-last-run">上次执行: 3小时前</div>
+                        </div>
+                        <div class="task-item-actions">
+                            <button onclick="event.stopPropagation(); editTask('task2');" title="编辑">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </button>
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteTask('task2');" title="删除">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="task-item" onclick="openTaskDetail('task3')">
+                        <div class="task-item-main">
+                            <h3 class="task-item-title">黄金市场分析</h3>
+                            <div class="task-item-preview">黄金突破2100美元 - 避险需求上升</div>
+                        </div>
+                        <div class="task-item-meta">
+                            <div class="task-item-cycle">每日 09:00</div>
+                            <div class="task-item-last-run">上次执行: 6小时前</div>
+                        </div>
+                        <div class="task-item-actions">
+                            <button onclick="event.stopPropagation(); editTask('task3');" title="编辑">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </button>
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteTask('task3');" title="删除">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="task-item" onclick="openTaskDetail('task4')">
+                        <div class="task-item-main">
+                            <h3 class="task-item-title">每周技术周报</h3>
+                            <div class="task-item-preview">本周技术动态汇总（11.5-11.11）</div>
+                        </div>
+                        <div class="task-item-meta">
+                            <div class="task-item-cycle">每周五 17:00</div>
+                            <div class="task-item-last-run">上次执行: 3天前</div>
+                        </div>
+                        <div class="task-item-actions">
+                            <button onclick="event.stopPropagation(); editTask('task4');" title="编辑">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </button>
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteTask('task4');" title="删除">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="task-item" onclick="openTaskDetail('template1')">
+                        <div class="task-item-main">
+                            <h3 class="task-item-title">创建每日股票追踪列表</h3>
+                            <div class="task-item-preview">提供关于 $TSLA, $BTC, $NVDA 等的最新动态...</div>
+                        </div>
+                        <div class="task-item-meta">
+                            <div class="task-item-cycle">每日 14:00</div>
+                            <div class="task-item-last-run">上次执行: 未执行</div>
+                        </div>
+                        <div class="task-item-actions">
+                            <button onclick="event.stopPropagation(); editTask('template1');" title="编辑">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </button>
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteTask('template1');" title="删除">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="task-item" onclick="openTaskDetail('template2')">
+                        <div class="task-item-main">
+                            <h3 class="task-item-title">创建定制简报</h3>
+                            <div class="task-item-preview">提供过去24小时内politics, technology相关的重点新闻...</div>
+                        </div>
+                        <div class="task-item-meta">
+                            <div class="task-item-cycle">每周一 10:20</div>
+                            <div class="task-item-last-run">上次执行: 未执行</div>
+                        </div>
+                        <div class="task-item-actions">
+                            <button onclick="event.stopPropagation(); editTask('template2');" title="编辑">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </button>
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteTask('template2');" title="删除">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧详情面板（从右侧滑入） -->
+            <div class="task-detail-panel" id="taskDetailPanel">
+                <div class="task-detail-content">
+                    <div class="task-detail-header">
+                        <div class="task-detail-header-top">
+                            <h1 class="task-detail-title" id="taskDetailTitle">每日科技简报</h1>
+                            <div class="task-detail-header-actions">
+                                <button class="icon-btn" onclick="closeTaskDetail()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="task-meta-row">
+                            <div class="task-schedule-badge" id="taskDetailMeta">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+                                </svg>
+                                每日 15:40
+                            </div>
+                            <div class="task-detail-actions">
+                                <button class="task-action-btn" onclick="editTaskFromDetail()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                    </svg>
+                                </button>
+                                <button class="task-action-btn" id="deleteTaskBtn" onclick="deleteTaskFromDetail()" style="color: #dc3545;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                    </svg>
+                                </button>
+                                <button class="task-action-btn primary" onclick="testTask()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                    </svg>
+                                    测试
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="task-detail-body">
+                        <div class="task-detail-section">
+                            <div class="task-prompt-box" id="taskDetailPrompt">
+                                总结过去24小时内最重要的人工智能和科技动态，包括新工具发布、产品更新和重大公告。优先关注 model releases, new papers, and open-source projects的内容，并提供网络搜索的来源链接。整理信息，使其清晰易读。
+                            </div>
+                        </div>
+
+                        <div class="task-detail-section">
+                            <div id="taskDetailHistory">
+                                <!-- 执行结果导航 -->
+                                <div class="result-navigation">
+                                    <div class="result-nav-left">
+                                        <div class="result-nav-arrows">
+                                            <button disabled>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                                                </svg>
+                                            </button>
+                                            <button>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <div class="result-title-info">
+                                            <div class="result-title-main" id="resultTitle">OpenAI releases safety models</div>
+                                            <div class="result-title-meta" id="resultMeta">Mon Nov 03 2025 · Ran for 1m 3s</div>
+                                        </div>
+                                    </div>
+                                    <div class="result-nav-right">
+                                    </div>
+                                </div>
+
+                                <!-- 思考时间 -->
+                                <div class="thinking-time" id="thinkingTime">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>
+                                    </svg>
+                                    思考了 36s
+                                </div>
+
+                                <!-- 报告内容 -->
+                                <div class="report-content" id="reportContent">
+                                    <h2 class="report-section-title">AI Model Releases</h2>
+                                    <ul class="report-list">
+                                        <li class="report-list-item">
+                                            <div class="report-item-title">OpenAI's gpt-oss-safeguard Models:</div>
+                                            <div class="report-item-content">
+                                                OpenAI released two new open-weight reasoning models (20B and 120B parameters) for safety classification tasks, using a chain-of-thought approach to interpret developer policies during inference. These are available on Hugging Face and Ollama.
+                                            </div>
+                                            <a href="#" class="report-item-source">@tinztwins</a>
+                                            <button class="expand-more-btn">+更多 2</button>
+                                        </li>
+                                        <li class="report-list-item">
+                                            <div class="report-item-title">MistralAI's Open-Source Model:</div>
+                                            <div class="report-item-content">
+                                                MistralAI launched a new open-source AI model designed to empower developers with accessible tools for innovation.
+                                            </div>
+                                            <a href="#" class="report-item-source">@Daily5MinNews</a>
+                                        </li>
+                                        <li class="report-list-item">
+                                            <div class="report-item-title">Windsurf SWE-1.5 Coding Model:</div>
+                                            <div class="report-item-content">
+                                                A new coding model that's reportedly 13 times faster than Claude Sonnet 4.5, focusing on efficiency for developers.
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+
+        <!-- HR-Agent 页面 -->
+        <div class="page" id="hrAgentPage" style="flex-direction: column;">
+            <div class="hr-agent-container" style="flex: 1; display: flex; flex-direction: column; padding: 40px; max-width: 1000px; margin: 0 auto; width: 100%;">
+                <div class="hr-agent-header" style="text-align: center; margin-bottom: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">👔</div>
+                    <h1 style="font-size: 32px; font-weight: 600; color: #1a1a1a; margin-bottom: 12px;">HR-Agent</h1>
+                    <p style="font-size: 16px; color: #666;">智能人力资源助手,为您提供专业的HR咨询服务</p>
+                </div>
+
+                <div class="hr-chat-box" style="flex: 1; display: flex; flex-direction: column; background: white; border-radius: 12px; border: 1px solid #e5e5e5; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                    <div class="hr-messages" id="hrMessages" style="flex: 1; overflow-y: auto; padding: 24px;">
+                        <div class="welcome-message" style="text-align: center; padding: 40px 20px; color: #999;">
+                            <p style="font-size: 14px; line-height: 1.6;">
+                                👋 您好!我是HR-Agent,您的智能人力资源助手<br>
+                                我可以帮助您解答关于:<br>
+                                • 招聘与面试 • 员工培训与发展 • 薪酬福利<br>
+                                • 绩效管理 • 劳动法规 • 员工关系等问题
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="hr-input-area" style="border-top: 1px solid #e5e5e5; padding: 20px; background: #fafafa;">
+                        <div style="display: flex; gap: 12px; align-items: flex-end;">
+                            <textarea
+                                id="hrInput"
+                                placeholder="输入您的HR相关问题..."
+                                style="flex: 1; min-height: 60px; max-height: 200px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; line-height: 1.6; resize: none; font-family: inherit;"
+                                onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendHRMessage(); }"
+                            ></textarea>
+                            <button
+                                onclick="sendHRMessage()"
+                                style="padding: 12px 24px; background: linear-gradient(135deg, #5470ff 0%, #667eea 100%); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; height: 60px; transition: all 0.2s;"
+                                onmouseover="this.style.transform='scale(1.02)'"
+                                onmouseout="this.style.transform='scale(1)'"
+                            >
+                                发送
+                            </button>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 12px; color: #999;">
+                            按 Enter 发送,Shift + Enter 换行
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!-- 文件选择弹窗 -->
     <div class="modal-overlay" id="fileModal">
@@ -2027,24 +3477,60 @@
             count: 0
         };
 
+        // 侧边栏收起状态
+        let isSidebarCollapsed = false;
+
+        // ==================== 侧边栏控制 ====================
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            isSidebarCollapsed = !isSidebarCollapsed;
+
+            if (isSidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+            } else {
+                sidebar.classList.remove('collapsed');
+            }
+        }
+
         // ==================== 页面切换 ====================
         function navigateTo(page) {
+            console.log('导航到页面:', page);
+
             // 更新页面显示
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 
             if (page === 'writing') {
                 document.getElementById('writingPage').classList.add('active');
+            } else if (page === 'schedule') {
+                const schedulePage = document.getElementById('schedulePage');
+                console.log('定时任务页面元素:', schedulePage);
+                if (schedulePage) {
+                    schedulePage.classList.add('active');
+                    console.log('已激活定时任务页面');
+                }
+            } else if (page === 'hr-agent') {
+                document.getElementById('hrAgentPage').classList.add('active');
             } else {
                 document.getElementById('homePage').classList.add('active');
             }
 
-            // 更新导航高亮
+            // 更新导航高亮 - 移除所有高亮
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
-                if (item.dataset.page === page) {
-                    item.classList.add('active');
-                }
             });
+            document.querySelector('.new-chat')?.classList.remove('active');
+
+            // 根据页面高亮对应的导航项
+            if (page === 'home') {
+                document.querySelector('.new-chat')?.classList.add('active');
+            } else {
+                // 高亮对应的导航项
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    if (item.dataset.page === page) {
+                        item.classList.add('active');
+                    }
+                });
+            }
 
             currentPage = page;
         }
@@ -2056,11 +3542,12 @@
             });
         });
 
-        // 初始化：默认不高亮任何导航项（首页状态）
+        // 初始化：默认高亮"新对话"（首页状态）
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
+            document.querySelector('.new-chat')?.classList.add('active');
         });
 
         // ==================== 首页功能切换 ====================
@@ -2394,6 +3881,1541 @@
             }
 
             scrollChatToBottom();
+        }
+
+        // ==================== 定时任务功能 ====================
+        // 任务数据
+        const tasksData = {
+            task1: {
+                title: '每日科技简报',
+                schedule: '每日 15:40',
+                status: 'active',
+                prompt: '总结过去24小时内最重要的人工智能和科技动态，包括新工具发布、产品更新和重大公告。优先关注 model releases, new papers, and open-source projects的内容，并提供网络搜索的来源链接。整理信息，使其清晰易读。',
+                history: [
+                    {
+                        title: 'OpenAI releases safety models',
+                        date: '2025-11-11',
+                        executeTime: '15:40',
+                        time: '2025年11月11日 15:40',
+                        thinkingTime: '36s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">AI Model Releases</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">OpenAI\'s gpt-oss-safeguard Models:</div><div class="report-item-content">OpenAI released two new open-weight reasoning models (20B and 120B parameters) for safety classification tasks, using a chain-of-thought approach to interpret developer policies during inference. These are available on Hugging Face and Ollama.</div><a href="#" class="report-item-source">@tinztwins</a><button class="expand-more-btn">+更多 2</button></li><li class="report-list-item"><div class="report-item-title">MistralAI\'s Open-Source Model:</div><div class="report-item-content">MistralAI launched a new open-source AI model designed to empower developers with accessible tools for innovation.</div><a href="#" class="report-item-source">@Daily5MinNews</a></li></ul>'
+                    },
+                    {
+                        title: 'OpenAI safety models - 测试运行',
+                        date: '2025-11-11',
+                        executeTime: '16:25',
+                        time: '2025年11月11日 16:25',
+                        thinkingTime: '28s',
+                        isManual: true,
+                        content: '<h2 class="report-section-title">AI Model Releases (测试)</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">测试运行结果:</div><div class="report-item-content">这是一次手动触发的测试运行,验证任务配置是否正常工作。</div></li><li class="report-list-item"><div class="report-item-title">OpenAI\'s gpt-oss-safeguard Models:</div><div class="report-item-content">OpenAI released two new open-weight reasoning models (20B and 120B parameters) for safety classification tasks.</div></li></ul>'
+                    },
+                    {
+                        title: 'Google announces Gemini 2.0 Pro',
+                        date: '2025-11-10',
+                        executeTime: '15:40',
+                        time: '2025年11月10日 15:40',
+                        thinkingTime: '42s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">Major AI Announcements</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">Google Gemini 2.0 Pro:</div><div class="report-item-content">Google unveiled Gemini 2.0 Pro with enhanced multimodal capabilities, featuring improved reasoning, longer context windows (up to 2M tokens), and native code execution abilities.</div><a href="#" class="report-item-source">@GoogleAI</a></li><li class="report-list-item"><div class="report-item-title">Meta\'s Llama 3.5 Turbo:</div><div class="report-item-content">Meta released Llama 3.5 Turbo, a faster and more efficient version optimized for real-time applications and edge deployment.</div><a href="#" class="report-item-source">@MetaAI</a></li></ul>'
+                    },
+                    {
+                        title: 'Anthropic Claude 3.7 Beta Released',
+                        date: '2025-11-09',
+                        executeTime: '15:40',
+                        time: '2025年11月9日 15:40',
+                        thinkingTime: '28s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">Model Updates</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">Claude 3.7 Beta:</div><div class="report-item-content">Anthropic released Claude 3.7 in beta, featuring improved reasoning capabilities, better coding assistance, and enhanced safety measures. The model shows 15% improvement in complex reasoning tasks.</div><a href="#" class="report-item-source">@AnthropicAI</a><button class="expand-more-btn">+更多 3</button></li></ul>'
+                    },
+                    {
+                        title: 'GitHub Copilot X Updates',
+                        date: '2025-11-08',
+                        executeTime: '15:40',
+                        time: '2025年11月8日 15:40',
+                        thinkingTime: '31s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">Developer Tools</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">GitHub Copilot X:</div><div class="report-item-content">GitHub announced major updates to Copilot X, including voice-to-code capabilities, improved context awareness, and integration with GitHub Issues for automatic bug fixing.</div><a href="#" class="report-item-source">@GitHub</a></li><li class="report-list-item"><div class="report-item-title">Cursor IDE v0.40:</div><div class="report-item-content">Cursor released v0.40 with enhanced AI pair programming features and support for custom model endpoints.</div></li></ul>'
+                    },
+                    {
+                        title: 'AI Research: New Scaling Laws',
+                        date: '2025-11-07',
+                        executeTime: '15:40',
+                        time: '2025年11月7日 15:40',
+                        thinkingTime: '45s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">Research Papers</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">Scaling Laws 2.0:</div><div class="report-item-content">Researchers from Stanford and MIT published a groundbreaking paper on new scaling laws, suggesting that compute-optimal training may require different data mixtures than previously thought.</div><a href="#" class="report-item-source">@arxiv</a></li><li class="report-list-item"><div class="report-item-title">Efficient Attention Mechanisms:</div><div class="report-item-content">A new paper introduces "FlashAttention-3", achieving 3x speedup in transformer training with linear complexity.</div></li></ul>'
+                    },
+                    {
+                        title: 'Microsoft Copilot Studio Launch',
+                        date: '2025-11-06',
+                        executeTime: '15:40',
+                        time: '2025年11月6日 15:40',
+                        thinkingTime: '38s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">Enterprise AI</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">Microsoft Copilot Studio:</div><div class="report-item-content">Microsoft launched Copilot Studio, a low-code platform for building custom AI assistants integrated with Microsoft 365 and Azure services.</div><a href="#" class="report-item-source">@Microsoft</a><button class="expand-more-btn">+更多 1</button></li></ul>'
+                    },
+                    {
+                        title: 'DeepMind AlphaCode 3 Breakthrough',
+                        date: '2025-11-05',
+                        executeTime: '15:40',
+                        time: '2025年11月5日 15:40',
+                        thinkingTime: '52s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">AI Coding Advances</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">AlphaCode 3:</div><div class="report-item-content">DeepMind unveiled AlphaCode 3, achieving performance comparable to median competitive programmer on Codeforces. The system demonstrates advanced problem-solving and code generation capabilities.</div><a href="#" class="report-item-source">@DeepMind</a></li></ul>'
+                    }
+                ]
+            },
+            task2: {
+                title: '效率提升',
+                schedule: '每日 11:39',
+                status: 'active',
+                prompt: '提供一个实用的效率提升技巧或方法，帮助用户提高工作效率。',
+history: [
+                    {
+                        title: '2分钟法则 - 立即行动',
+                        date: '2025-11-11',
+                        executeTime: '11:39',
+                        time: '2025年11月11日 11:39',
+                        thinkingTime: '8s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日效率提升</h2><div class="report-item-content"><p><strong>2分钟法则</strong>是一个简单但强大的时间管理原则：</p><ul class="report-list"><li class="report-list-item">如果一件事可以在2分钟内完成，<strong>立即去做</strong></li><li class="report-list-item">避免将小任务添加到待办清单，减少心理负担</li><li class="report-list-item">培养即时行动的习惯，减少拖延</li></ul><p style="margin-top: 16px; color: #666;">这个原则帮助你保持高效的工作流程，避免小事累积成大问题。</p></div>'
+                    },
+                    {
+                        title: '番茄工作法 - 专注25分钟',
+                        date: '2025-11-10',
+                        executeTime: '11:39',
+                        time: '2025年11月10日 11:39',
+                        thinkingTime: '12s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日效率提升</h2><div class="report-item-content"><p><strong>番茄工作法</strong>帮助你保持专注：</p><ul class="report-list"><li class="report-list-item">设置25分钟计时器，全神贯注工作</li><li class="report-list-item">休息5分钟，让大脑放松</li><li class="report-list-item">完成4个番茄后，休息15-30分钟</li></ul><p style="margin-top: 16px; color: #666;">这种方法能显著提高专注度，减少疲劳感。</p></div>'
+                    },
+                    {
+                        title: '艾森豪威尔矩阵 - 优先级管理',
+                        date: '2025-11-09',
+                        executeTime: '11:39',
+                        time: '2025年11月9日 11:39',
+                        thinkingTime: '15s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日效率提升</h2><div class="report-item-content"><p><strong>艾森豪威尔矩阵</strong>帮你分清任务优先级：</p><ul class="report-list"><li class="report-list-item"><strong>紧急且重要</strong>：立即执行</li><li class="report-list-item"><strong>重要不紧急</strong>：安排时间执行</li><li class="report-list-item"><strong>紧急不重要</strong>：委托他人</li><li class="report-list-item"><strong>不紧急不重要</strong>：删除或延后</li></ul></div>'
+                    },
+                    {
+                        title: '早晨黄金时段 - 高效开局',
+                        date: '2025-11-08',
+                        executeTime: '11:39',
+                        time: '2025年11月8日 11:39',
+                        thinkingTime: '10s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日效率提升</h2><div class="report-item-content"><p><strong>利用早晨2小时</strong>完成最重要的任务：</p><ul class="report-list"><li class="report-list-item">大脑在清晨最清醒，决策力最强</li><li class="report-list-item">完成一天中最困难的任务</li><li class="report-list-item">避免被琐事打断</li></ul></div>'
+                    },
+                    {
+                        title: '批处理任务 - 减少切换成本',
+                        date: '2025-11-07',
+                        executeTime: '11:39',
+                        time: '2025年11月7日 11:39',
+                        thinkingTime: '11s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日效率提升</h2><div class="report-item-content"><p><strong>批处理相似任务</strong>提高效率：</p><ul class="report-list"><li class="report-list-item">将相似的任务集中在一起完成</li><li class="report-list-item">减少上下文切换的时间成本</li><li class="report-list-item">例如：集中回复邮件、统一处理文档</li></ul></div>'
+                    },
+                    {
+                        title: '80/20法则 - 聚焦关键',
+                        date: '2025-11-06',
+                        executeTime: '11:39',
+                        time: '2025年11月6日 11:39',
+                        thinkingTime: '9s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日效率提升</h2><div class="report-item-content"><p><strong>帕累托法则</strong>：80%的结果来自20%的努力</p><ul class="report-list"><li class="report-list-item">识别最重要的20%任务</li><li class="report-list-item">将精力集中在高价值活动上</li><li class="report-list-item">不要在低效任务上浪费时间</li></ul></div>'
+                    },
+                    {
+                        title: '数字断舍离 - 减少干扰',
+                        date: '2025-11-05',
+                        executeTime: '11:39',
+                        time: '2025年11月5日 11:39',
+                        thinkingTime: '13s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日效率提升</h2><div class="report-item-content"><p><strong>减少数字干扰</strong>提升专注力：</p><ul class="report-list"><li class="report-list-item">关闭不必要的通知</li><li class="report-list-item">使用专注模式或勿扰模式</li><li class="report-list-item">设定特定时间查看社交媒体</li></ul></div>'
+                    }
+                ]
+            },
+            task3: {
+                title: '黄金市场分析',
+                schedule: '每日 09:00',
+                status: 'active',
+                prompt: '分析今日黄金市场走势，包括国际金价、影响因素、技术指标和投资建议。',
+history: [
+                    {
+                        title: '黄金突破2100美元 - 避险需求上升',
+                        date: '2025-11-11',
+                        executeTime: '09:00',
+                        time: '2025年11月11日 09:00',
+                        thinkingTime: '25s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日黄金市场</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">价格走势：</div><div class="report-item-content">现货黄金报2105.60美元/盎司，日内上涨1.8%，突破关键阻力位2100美元</div></li><li class="report-list-item"><div class="report-item-title">市场因素：</div><div class="report-item-content">地缘政治紧张局势升温，美元指数走弱，避险情绪推动金价上扬</div></li><li class="report-list-item"><div class="report-item-title">技术分析：</div><div class="report-item-content">RSI指标达到72，显示超买信号，但上升趋势依然强劲</div></li></ul>'
+                    },
+                    {
+                        title: '金价震荡整理 - 等待美联储信号',
+                        date: '2025-11-10',
+                        executeTime: '09:00',
+                        time: '2025年11月10日 09:00',
+                        thinkingTime: '22s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日黄金市场</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">价格走势：</div><div class="report-item-content">现货黄金在2080-2095美元区间震荡，市场等待美联储政策信号</div></li><li class="report-list-item"><div class="report-item-title">投资建议：</div><div class="report-item-content">短期内建议观望，关注2080支撑位和2110阻力位</div></li></ul>'
+                    },
+                    {
+                        title: '通胀数据支撑金价 - 维持强势',
+                        date: '2025-11-09',
+                        executeTime: '09:00',
+                        time: '2025年11月9日 09:00',
+                        thinkingTime: '28s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日黄金市场</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">价格走势：</div><div class="report-item-content">金价上涨至2092美元，受通胀数据高于预期支撑</div></li><li class="report-list-item"><div class="report-item-title">市场展望：</div><div class="report-item-content">通胀压力持续，黄金作为保值工具的吸引力增强</div></li></ul>'
+                    },
+                    {
+                        title: '美元走强施压金价 - 短期调整',
+                        date: '2025-11-08',
+                        executeTime: '09:00',
+                        time: '2025年11月8日 09:00',
+                        thinkingTime: '20s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日黄金市场</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">价格走势：</div><div class="report-item-content">金价回落至2075美元，美元指数反弹施压贵金属</div></li></ul>'
+                    },
+                    {
+                        title: '央行购金需求强劲 - 长期看涨',
+                        date: '2025-11-07',
+                        executeTime: '09:00',
+                        time: '2025年11月7日 09:00',
+                        thinkingTime: '26s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日黄金市场</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">价格走势：</div><div class="report-item-content">金价稳定在2085美元附近，全球央行持续增持黄金储备</div></li></ul>'
+                    },
+                    {
+                        title: '技术性反弹 - 关注关键位',
+                        date: '2025-11-06',
+                        executeTime: '09:00',
+                        time: '2025年11月6日 09:00',
+                        thinkingTime: '24s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日黄金市场</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">价格走势：</div><div class="report-item-content">金价从2070美元反弹至2082美元，技术性买盘入场</div></li></ul>'
+                    },
+                    {
+                        title: '市场情绪谨慎 - 窄幅波动',
+                        date: '2025-11-05',
+                        executeTime: '09:00',
+                        time: '2025年11月5日 09:00',
+                        thinkingTime: '18s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">今日黄金市场</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">价格走势：</div><div class="report-item-content">金价在2070-2080美元小幅波动，市场情绪谨慎</div></li></ul>'
+                    }
+                ]
+            },
+            task4: {
+                title: '每周技术周报',
+                schedule: '每周五 17:00',
+                status: 'active',
+                prompt: '总结本周重要的技术新闻、开源项目更新和开发者工具发布。',
+history: [
+                    {
+                        title: '本周技术动态汇总（11.5-11.11）',
+                        date: '2025-11-08',
+                        executeTime: '17:00',
+                        time: '2025年11月8日 17:00',
+                        thinkingTime: '65s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">本周技术亮点</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">React 19 RC发布：</div><div class="report-item-content">React团队发布19.0候选版本，引入服务器组件、Actions API等重大特性，标志着React进入新时代</div><a href="#" class="report-item-source">@reactjs</a></li><li class="report-list-item"><div class="report-item-title">Bun 1.1发布：</div><div class="report-item-content">Bun运行时更新至1.1版本，性能提升40%，新增Windows原生支持</div></li><li class="report-list-item"><div class="report-item-title">TypeScript 5.4：</div><div class="report-item-content">微软发布TS 5.4，优化类型推断速度，新增NoInfer工具类型</div></li></ul>'
+                    },
+                    {
+                        title: '本周技术动态汇总（10.29-11.4）',
+                        date: '2025-11-01',
+                        executeTime: '17:00',
+                        time: '2025年11月1日 17:00',
+                        thinkingTime: '58s',
+                        isManual: false,
+                        content: '<h2 class="report-section-title">本周技术亮点</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">Next.js 15发布：</div><div class="report-item-content">Vercel推出Next.js 15，大幅优化构建性能，完善App Router生态</div></li><li class="report-list-item"><div class="report-item-title">Python 3.13：</div><div class="report-item-content">Python社区发布3.13版本，引入实验性JIT编译器，性能提升显著</div></li></ul>'
+                    }
+                ]
+            },
+            template1: {
+                title: '创建每日股票追踪列表',
+                schedule: '每日 14:00',
+                status: 'paused',
+                prompt: '提供关于 $TSLA, $BTC, $NVDA, $PLTR, $ETH 的最新动态，包括当前价格、近期走势和市场预测。分析市场情况，提供投资建议。',
+                history: []
+            },
+            template2: {
+                title: '创建定制简报',
+                schedule: '每周一 10:20',
+                status: 'paused',
+                prompt: '提供过去24小时内与 politics, technology, and science 相关的重点新闻摘要。每条新闻提供一个核心要点。以目标受众为考虑，提供深入分析。',
+                history: []
+            }
+        };
+
+        // 当前查看的任务和历史索引
+        let currentTaskId = null;
+        let currentHistoryIndex = 0;
+
+        // 打开任务详情
+        function openTaskDetail(taskId) {
+            currentTaskId = taskId;
+            currentHistoryIndex = 0; // 默认显示最新的记录
+            renderTaskDetail();
+
+            // 更新任务项的active状态
+            document.querySelectorAll('.task-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.task-item').classList.add('active');
+
+            // 显示详情面板（带动画）
+            const panel = document.getElementById('taskDetailPanel');
+            const listPanel = document.querySelector('.task-list-panel');
+            panel.classList.add('active');
+            listPanel.classList.add('detail-open');
+        }
+
+        // 渲染任务详情
+        function renderTaskDetail() {
+            const task = tasksData[currentTaskId];
+            if (!task) return;
+
+            // 更新标题和元数据
+            document.getElementById('taskDetailTitle').textContent = task.title;
+
+            // 更新schedule badge (保留SVG icon)
+            const metaBadge = document.getElementById('taskDetailMeta');
+            const svgIcon = metaBadge.querySelector('svg');
+            metaBadge.innerHTML = '';
+            if (svgIcon) {
+                metaBadge.appendChild(svgIcon.cloneNode(true));
+            }
+            metaBadge.appendChild(document.createTextNode(task.schedule));
+
+            // 更新prompt
+            document.getElementById('taskDetailPrompt').textContent = task.prompt;
+
+            // 更新暂停按钮状态
+            updatePauseButton();
+
+            // 更新执行历史 - 使用Grok风格的布局
+            if (task.history.length === 0) {
+                document.getElementById('taskDetailHistory').innerHTML = '<div style="color: #999; font-size: 14px; text-align: center; padding: 40px;">暂无执行记录</div>';
+            } else {
+                const result = task.history[currentHistoryIndex];
+
+                // 更新result navigation with prev/next buttons
+                const historyContainer = document.getElementById('taskDetailHistory');
+                historyContainer.innerHTML = `
+                    <!-- 执行结果导航 -->
+                    <div class="result-navigation">
+                        <div class="result-nav-left">
+                            <div class="result-nav-arrows">
+                                <button ${currentHistoryIndex >= task.history.length - 1 ? 'disabled' : ''} onclick="navigateHistory('prev')" style="width: 28px; height: 28px; border: 1px solid #e0e0e0; background: ${currentHistoryIndex >= task.history.length - 1 ? '#fafafa' : '#fff'}; border-radius: 4px; cursor: ${currentHistoryIndex >= task.history.length - 1 ? 'not-allowed' : 'pointer'}; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color: ${currentHistoryIndex >= task.history.length - 1 ? '#ccc' : '#666'};">
+                                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                                    </svg>
+                                </button>
+                                <button ${currentHistoryIndex <= 0 ? 'disabled' : ''} onclick="navigateHistory('next')" style="width: 28px; height: 28px; border: 1px solid #e0e0e0; background: ${currentHistoryIndex <= 0 ? '#fafafa' : '#fff'}; border-radius: 4px; cursor: ${currentHistoryIndex <= 0 ? 'not-allowed' : 'pointer'}; display: flex; align-items: center; justify-content: center; margin-left: 6px;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color: ${currentHistoryIndex <= 0 ? '#ccc' : '#666'};">
+                                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="result-title-info">
+                                <div class="result-title-main" id="resultTitle">${result.title}${result.isManual ? ' <span style="color: #7c6bf6; font-size: 12px; font-weight: 500; background: rgba(124, 107, 246, 0.1); padding: 2px 8px; border-radius: 4px; margin-left: 8px;">测试</span>' : ''}</div>
+                                <div class="result-title-meta" id="resultMeta" style="cursor: pointer; padding: 4px 8px; margin: -4px -8px; border-radius: 4px; transition: background 0.2s;" onclick="showDatePicker()" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">${result.time}</div>
+                            </div>
+                        </div>
+                        <div class="result-nav-right">
+                        </div>
+                    </div>
+
+                    <!-- 报告内容 -->
+                    <div class="report-content" id="reportContent">
+                        ${result.content}
+                    </div>
+                `;
+            }
+        }
+
+        // 前后导航
+        function navigateHistory(direction) {
+            const task = tasksData[currentTaskId];
+            if (!task) return;
+
+            if (direction === 'prev' && currentHistoryIndex < task.history.length - 1) {
+                currentHistoryIndex++;
+                renderTaskDetail();
+            } else if (direction === 'next' && currentHistoryIndex > 0) {
+                currentHistoryIndex--;
+                renderTaskDetail();
+            }
+        }
+
+        // 显示最新结果
+        function showLatestResult() {
+            currentHistoryIndex = 0;
+            renderTaskDetail();
+        }
+
+        // 日历状态
+        let calendarDate = new Date();
+        let selectedDate = null;
+
+        // 显示日期选择器（日历组件）
+        function showDatePicker() {
+            const task = tasksData[currentTaskId];
+            if (!task || task.history.length === 0) return;
+
+            // 获取当前选中的日期
+            const currentResult = task.history[currentHistoryIndex];
+            selectedDate = new Date(currentResult.date);
+            calendarDate = new Date(selectedDate);
+
+            // 创建日历弹窗
+            const modal = document.createElement('div');
+            modal.className = 'calendar-modal';
+            modal.onclick = (e) => {
+                if (e.target === modal) modal.remove();
+            };
+
+            const container = document.createElement('div');
+            container.className = 'calendar-container';
+
+            container.innerHTML = `
+                <div class="calendar-header">
+                    <h3>选择日期</h3>
+                    <div class="calendar-nav">
+                        <button onclick="changeMonth(-1)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                            </svg>
+                        </button>
+                        <div class="calendar-month-year" id="calendarMonthYear"></div>
+                        <button onclick="changeMonth(1)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="calendar-weekday">日</div>
+                    <div class="calendar-weekday">一</div>
+                    <div class="calendar-weekday">二</div>
+                    <div class="calendar-weekday">三</div>
+                    <div class="calendar-weekday">四</div>
+                    <div class="calendar-weekday">五</div>
+                    <div class="calendar-weekday">六</div>
+                </div>
+                <div class="calendar-days" id="calendarDays"></div>
+                <div class="calendar-footer">
+                    <button class="btn-cancel" onclick="document.querySelector('.calendar-modal').remove()">取消</button>
+                    <button class="btn-confirm" onclick="confirmDateSelection()">确定</button>
+                </div>
+            `;
+
+            modal.appendChild(container);
+            document.body.appendChild(modal);
+
+            renderCalendar();
+        }
+
+        // 渲染日历
+        function renderCalendar() {
+            console.log('渲染日历, selectedDate:', selectedDate);
+            const task = tasksData[currentTaskId];
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+
+            // 更新月年显示
+            const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            document.getElementById('calendarMonthYear').textContent = `${year}年 ${monthNames[month]}`;
+
+            // 获取当月第一天和最后一天
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const firstDayWeek = firstDay.getDay();
+            const daysInMonth = lastDay.getDate();
+
+            // 获取上个月的天数
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+            // 创建日历格子
+            const daysContainer = document.getElementById('calendarDays');
+            daysContainer.innerHTML = '';
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // 创建有历史记录的日期集合
+            const historyDates = new Set(task.history.map(item => item.date));
+
+            // 上个月的日期
+            for (let i = firstDayWeek - 1; i >= 0; i--) {
+                const day = prevMonthLastDay - i;
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day other-month';
+                dayDiv.textContent = day;
+                daysContainer.appendChild(dayDiv);
+            }
+
+            // 当月的日期
+            for (let day = 1; day <= daysInMonth; day++) {
+                const currentDate = new Date(year, month, day);
+                currentDate.setHours(0, 0, 0, 0);
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day';
+                dayDiv.textContent = day;
+
+                // 判断是否是今天
+                if (currentDate.getTime() === today.getTime()) {
+                    dayDiv.classList.add('today');
+                }
+
+                // 判断是否是选中的日期
+                if (selectedDate) {
+                    const isSelected = currentDate.getTime() === selectedDate.getTime();
+                    if (isSelected) {
+                        console.log('找到选中日期:', dateStr, '添加selected类');
+                        dayDiv.classList.add('selected');
+                    }
+                }
+
+                // 判断是否有历史数据
+                if (historyDates.has(dateStr)) {
+                    dayDiv.classList.add('has-data');
+                    dayDiv.onclick = () => selectCalendarDate(dateStr);
+                    dayDiv.style.cursor = 'pointer';
+                } else {
+                    dayDiv.style.cursor = 'not-allowed';
+                    // 不设置opacity,让CSS来控制
+                    dayDiv.classList.add('no-data');
+                }
+
+                daysContainer.appendChild(dayDiv);
+            }
+
+            // 下个月的日期（填充剩余格子）
+            const remainingDays = 42 - (firstDayWeek + daysInMonth);
+            for (let day = 1; day <= remainingDays; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day other-month';
+                dayDiv.textContent = day;
+                daysContainer.appendChild(dayDiv);
+            }
+        }
+
+        // 切换月份
+        function changeMonth(delta) {
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        // 选择日历日期
+        function selectCalendarDate(dateStr) {
+            console.log('选择日期:', dateStr);
+            selectedDate = new Date(dateStr);
+            selectedDate.setHours(0, 0, 0, 0);
+            console.log('selectedDate设置为:', selectedDate, 'timestamp:', selectedDate.getTime());
+            renderCalendar();
+        }
+
+        // 确认日期选择
+        function confirmDateSelection() {
+            if (!selectedDate) {
+                document.querySelector('.calendar-modal').remove();
+                return;
+            }
+
+            const task = tasksData[currentTaskId];
+            const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
+
+            // 查找对应日期的历史记录
+            const index = task.history.findIndex(item => item.date === dateStr);
+            if (index !== -1) {
+                currentHistoryIndex = index;
+                renderTaskDetail();
+            }
+
+            document.querySelector('.calendar-modal').remove();
+        }
+
+        // 关闭任务详情
+        function closeTaskDetail() {
+            const panel = document.getElementById('taskDetailPanel');
+            const listPanel = document.querySelector('.task-list-panel');
+            panel.classList.remove('active');
+            listPanel.classList.remove('detail-open');
+
+            document.querySelectorAll('.task-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+
+        // 从详情页编辑任务
+        function editTaskFromDetail() {
+            if (currentTaskId) {
+                editTask(currentTaskId);
+            }
+        }
+
+        // 从详情页删除任务
+        function deleteTaskFromDetail() {
+            if (currentTaskId) {
+                deleteTask(currentTaskId);
+            }
+        }
+
+        // 测试运行任务
+        function runTestTask() {
+            if (!currentTaskId) return;
+
+            const task = tasksData[currentTaskId];
+            if (!task) return;
+
+            // 模拟测试运行
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            const newResult = {
+                title: task.title + ' - 测试运行',
+                date: dateStr,
+                executeTime: timeStr,
+                time: `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${timeStr}`,
+                thinkingTime: Math.floor(Math.random() * 30 + 10) + 's',
+                isManual: true,
+                content: '<h2 class="report-section-title">测试运行</h2><ul class="report-list"><li class="report-list-item"><div class="report-item-title">测试执行成功</div><div class="report-item-content">这是一次手动触发的测试运行,用于验证任务配置是否正常工作。系统已按照设定的提示词执行任务,并生成了本次报告。</div></li></ul>'
+            };
+
+            // 将新结果添加到历史记录开头
+            task.history.unshift(newResult);
+
+            // 显示最新结果
+            currentHistoryIndex = 0;
+            renderTaskDetail();
+
+            // 显示提示
+            alert('测试运行完成！已生成测试报告。');
+        }
+
+        // 删除任务
+        function deleteTask(taskId) {
+            if (confirm('确定要删除这个任务吗?')) {
+                // 从数据中删除
+                delete tasksData[taskId];
+
+                // 从DOM中删除任务卡片
+                const taskItems = document.querySelectorAll('.task-item');
+                taskItems.forEach(item => {
+                    const onclick = item.getAttribute('onclick');
+                    if (onclick && onclick.includes(taskId)) {
+                        item.remove();
+                    }
+                });
+
+                // 如果当前详情页打开的是这个任务,关闭详情页
+                if (currentTaskId === taskId) {
+                    closeTaskDetail();
+                }
+
+                alert('任务已删除');
+            }
+        }
+
+        // 创建新任务
+        function createNewTask() {
+            showCreateTaskModal();
+        }
+
+        // 编辑任务
+        function editTask(taskId) {
+            const task = tasksData[taskId];
+            if (!task) return;
+
+            // 解析schedule字符串,提取时间和频率信息
+            let frequency = 'daily';
+            let time = '14:00';
+            let weekday = '1';
+
+            if (task.schedule) {
+                // 提取时间 (格式: HH:MM)
+                const timeMatch = task.schedule.match(/(\d{1,2}:\d{2})/);
+                if (timeMatch) {
+                    time = timeMatch[1];
+                }
+
+                // 判断频率
+                if (task.schedule.includes('每小时')) {
+                    frequency = 'hourly';
+                } else if (task.schedule.includes('每日')) {
+                    frequency = 'daily';
+                } else if (task.schedule.includes('每周')) {
+                    frequency = 'weekly';
+                    // 提取星期
+                    const weekdayMap = {
+                        '星期日': '0', '日': '0',
+                        '星期一': '1', '一': '1',
+                        '星期二': '2', '二': '2',
+                        '星期三': '3', '三': '3',
+                        '星期四': '4', '四': '4',
+                        '星期五': '5', '五': '5',
+                        '星期六': '6', '六': '6'
+                    };
+                    for (const [key, value] of Object.entries(weekdayMap)) {
+                        if (task.schedule.includes(key)) {
+                            weekday = value;
+                            break;
+                        }
+                    }
+                } else if (task.schedule.includes('每月')) {
+                    frequency = 'monthly';
+                } else if (task.schedule.includes('每年')) {
+                    frequency = 'yearly';
+                }
+            }
+
+            const taskWithParsedData = {
+                ...task,
+                frequency: frequency,
+                time: time,
+                weekday: weekday
+            };
+
+            showCreateTaskModal(taskWithParsedData);
+        }
+
+        function showCreateTaskModal(taskData = null) {
+            const modal = document.createElement('div');
+            modal.className = 'create-task-modal';
+            modal.onclick = (e) => {
+                if (e.target === modal) modal.remove();
+            };
+
+            const container = document.createElement('div');
+            container.className = 'create-task-container';
+            container.innerHTML = `
+                <div class="create-task-header">
+                    <h2>任务</h2>
+                    <button class="close-btn" onclick="document.querySelector('.create-task-modal').remove()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="create-task-body">
+                    <!-- 任务名称 -->
+                    <div class="form-group">
+                        <label class="form-label">任务名称</label>
+                        <input type="text" class="form-input" id="taskName" placeholder="输入任务名称" value="${taskData ? taskData.title : ''}">
+                    </div>
+
+                    <!-- 频率选择 -->
+                    <div class="form-group">
+                        <label class="form-label">频率</label>
+                        <div class="frequency-tabs">
+                            <button class="frequency-tab ${!taskData || taskData.frequency === 'daily' ? 'active' : ''}" data-freq="daily">每天</button>
+                            <button class="frequency-tab ${taskData && taskData.frequency === 'weekly' ? 'active' : ''}" data-freq="weekly">每周</button>
+                        </div>
+                    </div>
+
+                    <!-- 时间和星期 -->
+                    <div class="form-group">
+                        <div class="schedule-row">
+                            <div class="schedule-field">
+                                <label>时间</label>
+                                <input type="time" id="taskTime" value="${taskData ? taskData.time : '16:40'}">
+                            </div>
+                            <div class="schedule-field" id="weekdayField" style="display: none;">
+                                <label>&nbsp;</label>
+                                <div class="weekday-selector" id="weekdaySelector">
+                                    <label class="weekday-checkbox">
+                                        <input type="checkbox" value="0" ${taskData && taskData.weekdays && taskData.weekdays.includes('0') ? 'checked' : ''}>
+                                        <span>日</span>
+                                    </label>
+                                    <label class="weekday-checkbox">
+                                        <input type="checkbox" value="1" ${taskData && taskData.weekdays && taskData.weekdays.includes('1') ? 'checked' : ''}>
+                                        <span>一</span>
+                                    </label>
+                                    <label class="weekday-checkbox">
+                                        <input type="checkbox" value="2" ${taskData && taskData.weekdays && taskData.weekdays.includes('2') ? 'checked' : ''}>
+                                        <span>二</span>
+                                    </label>
+                                    <label class="weekday-checkbox">
+                                        <input type="checkbox" value="3" ${taskData && taskData.weekdays && taskData.weekdays.includes('3') ? 'checked' : ''}>
+                                        <span>三</span>
+                                    </label>
+                                    <label class="weekday-checkbox">
+                                        <input type="checkbox" value="4" ${!taskData || (taskData.weekdays && taskData.weekdays.includes('4')) ? 'checked' : ''}>
+                                        <span>四</span>
+                                    </label>
+                                    <label class="weekday-checkbox">
+                                        <input type="checkbox" value="5" ${taskData && taskData.weekdays && taskData.weekdays.includes('5') ? 'checked' : ''}>
+                                        <span>五</span>
+                                    </label>
+                                    <label class="weekday-checkbox">
+                                        <input type="checkbox" value="6" ${taskData && taskData.weekdays && taskData.weekdays.includes('6') ? 'checked' : ''}>
+                                        <span>六</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 指令 -->
+                    <div class="form-group">
+                        <label class="form-label">指令</label>
+                        <textarea class="form-input form-textarea" id="taskPrompt" placeholder="在此输入提示词。">${taskData ? taskData.prompt : ''}</textarea>
+                    </div>
+
+                    <!-- 执行应用 -->
+                    <div class="form-group">
+                        <label class="form-label">执行应用</label>
+                        <select id="agentMode" class="form-input" style="width: 100%; padding: 10px;">
+                            <option value="market" selected>每日市场动态</option>
+                            <option value="j-agent">J-Agent</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="create-task-footer">
+                    <button class="btn-create" onclick="submitCreateTask()">创建任务</button>
+                </div>
+            `;
+
+            modal.appendChild(container);
+            document.body.appendChild(modal);
+
+            // 如果是编辑模式，修改按钮文字
+            if (taskData) {
+                const submitBtn = container.querySelector('.btn-create');
+                submitBtn.textContent = '保存任务';
+            }
+
+            // 绑定频率选择
+            const weekdayField = container.querySelector('#weekdayField');
+            container.querySelectorAll('.frequency-tab').forEach(tab => {
+                tab.onclick = () => {
+                    container.querySelectorAll('.frequency-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    // 根据频率显示或隐藏星期选择
+                    const freq = tab.dataset.freq;
+                    if (freq === 'weekly') {
+                        weekdayField.style.display = 'flex';
+                    } else {
+                        weekdayField.style.display = 'none';
+                    }
+                };
+            });
+
+            // 初始化星期选择的显示状态
+            const initialFreq = container.querySelector('.frequency-tab.active')?.dataset.freq;
+            if (initialFreq === 'weekly') {
+                weekdayField.style.display = 'flex';
+            }
+        }
+
+        // 切换专家模式
+        function toggleExpertMode(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+        }
+
+        // 提交创建任务
+        function submitCreateTask() {
+            const taskName = document.getElementById('taskName').value.trim();
+            const taskTime = document.getElementById('taskTime').value;
+            const taskPrompt = document.getElementById('taskPrompt').value.trim();
+            const expertMode = document.getElementById('expertMode').checked;
+            const frequency = document.querySelector('.frequency-tab.active').dataset.freq;
+
+            if (!taskName) {
+                alert('请输入任务名称');
+                return;
+            }
+
+            if (!taskPrompt) {
+                alert('请输入任务指令');
+                return;
+            }
+
+            // 获取选中的星期(多选)
+            let selectedWeekdays = [];
+            if (frequency === 'weekly') {
+                selectedWeekdays = Array.from(document.querySelectorAll('#weekdaySelector input[type="checkbox"]:checked'))
+                    .map(cb => parseInt(cb.value));
+
+                if (selectedWeekdays.length === 0) {
+                    alert('请至少选择一个星期');
+                    return;
+                }
+            }
+
+            // 构建时间描述
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            let freqText = '';
+
+            if (frequency === 'daily') {
+                freqText = '每日';
+            } else if (frequency === 'weekly') {
+                const weekdayText = selectedWeekdays.map(w => weekdays[w]).join('、');
+                freqText = '每周' + weekdayText;
+            }
+
+            console.log('创建任务:', {
+                name: taskName,
+                frequency: frequency,
+                time: taskTime,
+                weekdays: selectedWeekdays,
+                prompt: taskPrompt,
+                expert: expertMode,
+                schedule: `${freqText} ${taskTime}`
+            });
+
+            alert(`任务创建成功！\n\n任务名称: ${taskName}\n频率: ${freqText} ${taskTime}\n专家模式: ${expertMode ? '是' : '否'}`);
+
+            document.querySelector('.create-task-modal').remove();
+        }
+
+
+        // 更新暂停按钮状态
+        function updatePauseButton() {
+            const task = tasksData[currentTaskId];
+            if (!task) return;
+
+            const btn = document.getElementById('pauseTaskBtn');
+            if (!btn) return;
+
+            if (task.status === 'paused') {
+                // 显示恢复按钮(播放图标)
+                btn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                `;
+            } else {
+                // 显示暂停按钮
+                btn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    </svg>
+                `;
+            }
+        }
+
+        // 切换暂停/恢复任务
+        function togglePauseTask() {
+            const task = tasksData[currentTaskId];
+            if (!task) return;
+
+            if (task.status === 'active') {
+                if (confirm(`确定要暂停任务"${task.title}"吗?\n\n暂停后将不再自动执行此任务。`)) {
+                    task.status = 'paused';
+                    alert(`任务"${task.title}"已暂停`);
+                    updatePauseButton();
+                }
+            } else {
+                if (confirm(`确定要恢复任务"${task.title}"吗?\n\n恢复后将按计划自动执行此任务。`)) {
+                    task.status = 'active';
+                    alert(`任务"${task.title}"已恢复`);
+                    updatePauseButton();
+                }
+            }
+        }
+
+        // 测试任务 - 调用DeepSeek生成Deep Research报告
+        async function testTask() {
+            const task = tasksData[currentTaskId];
+            if (!task) return;
+
+            const btn = event.target.closest('.task-action-btn');
+            const originalHTML = btn.innerHTML;
+
+            // 显示加载状态
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="animation: spin 1s linear infinite;">
+                    <style>
+                        @keyframes spin {
+                            from { transform: rotate(0deg); }
+                            to { transform: rotate(360deg); }
+                        }
+                    </style>
+                    <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+                </svg>
+                执行中...
+            `;
+
+            try {
+                console.log('开始执行任务:', task.title);
+                console.log('任务指令:', task.prompt);
+
+                // 调用DeepSeek API生成报告,带工具支持
+                const startTime = Date.now();
+                const result = await callDeepSeekAPIWithTools(task.prompt);
+
+                const endTime = Date.now();
+                const thinkingTime = Math.floor((endTime - startTime) / 1000);
+
+                console.log('报告生成完成，思考时间:', thinkingTime + 's');
+                console.log('报告内容:', result.content);
+                console.log('搜索来源:', result.sources);
+
+                // 创建新的历史记录
+                const now = new Date();
+                const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                const timeStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 · 思考了 ${thinkingTime}s`;
+
+                // 格式化报告内容为HTML
+                const formattedContent = formatReportContent(result.content, result.sources);
+
+                const newReport = {
+                    title: `测试执行: ${task.title}`,
+                    date: dateStr,
+                    time: timeStr,
+                    thinkingTime: thinkingTime + 's',
+                    content: formattedContent
+                };
+
+                // 添加到历史记录开头
+                task.history.unshift(newReport);
+
+                // 切换到最新记录并刷新显示
+                currentHistoryIndex = 0;
+                renderTaskDetail();
+
+                alert(`任务执行成功！\n\n生成了新的报告，思考时间: ${thinkingTime}秒\n搜索来源: ${result.sources?.length || 0}个`);
+
+            } catch (error) {
+                console.error('任务执行失败:', error);
+                alert(`任务执行失败\n\n错误: ${error.message}`);
+            } finally {
+                // 恢复按钮状态
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            }
+        }
+
+        // 调用DeepSeek API with 博查搜索和当前日期工具
+        async function callDeepSeekAPIWithTools(userPrompt) {
+            let searchSources = [];
+
+            try {
+                console.log('=== 开始Deep Research流程 ===');
+
+                // 步骤1: 直接执行工具,不等DeepSeek调用
+                console.log('步骤1: 获取当前时间');
+                const now = new Date();
+                const currentDate = {
+                    date: now.toISOString().split('T')[0],
+                    time: now.toTimeString().split(' ')[0],
+                    datetime: now.toISOString(),
+                    formatted: now.toLocaleString('zh-CN')
+                };
+                console.log('当前时间:', currentDate);
+
+                // 步骤2: 执行博查搜索
+                console.log('步骤2: 执行博查搜索');
+
+                // 构建更好的搜索查询
+                const searchQuery = `AI artificial intelligence technology news model release new papers open source projects ${currentDate.date}`;
+                console.log('搜索关键词:', searchQuery);
+
+                const searchResult = await executeBochaSearch(searchQuery, 50);
+                if (searchResult.results) {
+                    searchSources.push(...searchResult.results);
+                }
+                console.log('搜索完成,找到', searchSources.length, '个结果');
+
+                // 步骤3: 构建包含搜索结果的prompt
+                const searchResultsText = searchSources.map((source, index) => {
+                    return `[${index + 1}] ${source.title}\n${source.snippet}\nURL: ${source.url}\n发布时间: ${source.published_date}`;
+                }).join('\n\n');
+
+                const enhancedPrompt = `任务: ${userPrompt}
+
+当前时间: ${currentDate.formatted}
+
+以下是搜索到的最新信息:
+
+${searchResultsText}
+
+请严格按照以下要求生成Deep Research报告:
+
+1. **报告结构**:
+   - 使用清晰的标题和分节
+   - 按类别组织: Model Releases, New Papers, Open-source Projects, Product Updates, Major Announcements
+
+2. **内容要求**:
+   - 只总结过去24小时内的动态
+   - 重点关注人工智能和科技领域
+   - 每条信息必须包含: 标题、简要描述、来源链接
+   - 使用[1][2][3]等数字标注引用来源
+
+3. **格式要求**:
+   - 使用Markdown格式
+   - 每个类别下使用列表形式
+   - 信息清晰易读,避免冗长
+
+4. **来源标注**:
+   - 每条信息后标注来源编号,如: [1]
+   - 报告末尾列出所有来源的完整URL
+
+开始生成报告:`;
+
+                console.log('步骤3: 调用DeepSeek生成报告');
+
+                // 步骤4: 简单调用DeepSeek,不使用工具
+                const systemContent = `你是一个专业的Deep Research助手。用户已经为你提供了搜索结果,你只需要基于这些结果生成详细的报告即可。`;
+
+                const messages = [
+                    { role: 'system', content: systemContent },
+                    { role: 'user', content: enhancedPrompt }
+                ];
+
+                console.log('发送请求到DeepSeek API生成报告...');
+
+                const response = await fetch(DEEPSEEK_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: currentModel,
+                        messages: messages,
+                        temperature: 0.7,
+                        max_tokens: 4000,
+                        stream: true
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`API错误 ${response.status}: ${errorText}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullContent = ''; // 存储完整内容
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n').filter(line => line.trim());
+
+                    for (const line of lines) {
+                        if (!line.startsWith('data: ')) continue;
+                        const dataStr = line.substring(6);
+                        if (dataStr === '[DONE]') continue;
+
+                        try {
+                            const data = JSON.parse(dataStr);
+                            const delta = data.choices?.[0]?.delta;
+                            if (delta?.content) {
+                                fullContent += delta.content;
+                            }
+                        } catch (e) {
+                            console.warn('解析chunk出错:', e);
+                        }
+                    }
+                }
+
+                console.log('报告生成完成');
+                console.log('报告长度:', fullContent.length);
+                console.log('报告预览:', fullContent.substring(0, 500));
+
+                // 直接返回结果
+                return {
+                    content: fullContent,
+                    sources: searchSources
+                };
+
+                // ===== 以下是旧的循环代码,已废弃 =====
+                /*
+                // 循环处理工具调用,最多3轮
+                let maxRounds = 3;
+                let currentRound = 0;
+
+                while (currentRound < maxRounds) {
+                    currentRound++;
+                    console.log(`\n=== 第${currentRound}轮工具调用处理 ===`);
+                    console.log('当前fullContent:', fullContent.substring(0, 200));
+
+                    // 过滤掉空的工具调用(每轮都检查toolCallsArray)
+                    const validToolCalls = toolCallsArray.filter(tc => tc && tc.function.name);
+
+                    // 同时检查特殊格式的工具调用(每轮都检查fullContent)
+                    const specialToolCalls = parseDeepSeekToolCalls(fullContent);
+
+                    console.log('标准格式工具调用数量:', validToolCalls.length);
+                    console.log('特殊格式工具调用数量:', specialToolCalls.length);
+
+                    // 如果两种格式都没有,结束循环
+                    if (validToolCalls.length === 0 && specialToolCalls.length === 0) {
+                        console.log('没有检测到任何工具调用,结束循环');
+                        break;
+                    }
+
+                    // 合并两种格式的工具调用
+                    let allToolCalls = [...validToolCalls];
+
+                    // 将特殊格式转换为标准格式
+                    for (const specialCall of specialToolCalls) {
+                        allToolCalls.push({
+                            id: 'call_special_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                            type: 'function',
+                            function: {
+                                name: specialCall.name,
+                                arguments: JSON.stringify(specialCall.arguments)
+                            }
+                        });
+                    }
+
+                    console.log('总共需要执行的工具调用:', allToolCalls.length);
+
+                    if (allToolCalls.length > 0) {
+                    console.log('检测到工具调用:', allToolCalls);
+
+                    // 执行所有工具调用
+                    const toolResults = [];
+                    for (const toolCall of allToolCalls) {
+                        const functionName = toolCall.function.name;
+                        let functionArgs = {};
+
+                        // 解析参数
+                        try {
+                            if (toolCall.function.arguments) {
+                                functionArgs = JSON.parse(toolCall.function.arguments);
+                            }
+                        } catch (e) {
+                            console.warn('解析工具参数失败:', toolCall.function.arguments, e);
+                        }
+
+                        console.log(`执行工具: ${functionName}`, functionArgs);
+
+                        let toolResult = null;
+
+                        if (functionName === 'bocha_search') {
+                            // 调用博查搜索
+                            toolResult = await executeBochaSearch(functionArgs.query, functionArgs.count || 10);
+                            if (toolResult.results) {
+                                searchSources.push(...toolResult.results);
+                            }
+                        } else if (functionName === 'currentdate') {
+                            // 返回当前日期
+                            const now = new Date();
+                            toolResult = {
+                                date: now.toISOString().split('T')[0],
+                                time: now.toTimeString().split(' ')[0],
+                                datetime: now.toISOString(),
+                                formatted: now.toLocaleString('zh-CN')
+                            };
+                        }
+
+                        toolResults.push({
+                            tool_call_id: toolCall.id,
+                            role: 'tool',
+                            name: functionName,
+                            content: JSON.stringify(toolResult)
+                        });
+                    }
+
+                    // 清理第一次响应中的特殊格式标记
+                    let cleanedFirstContent = fullContent;
+                    cleanedFirstContent = cleanedFirstContent.replace(/<\|tool▁calls▁begin\|>[\s\S]*?<\|tool▁calls▁end\|>/g, '');
+                    cleanedFirstContent = cleanedFirstContent.replace(/<\|tool▁call▁begin\|>[\s\S]*?<\|tool▁call▁end\|>/g, '');
+                    cleanedFirstContent = cleanedFirstContent.trim();
+
+                    // 将assistant的工具调用添加到消息历史
+                    messages.push({
+                        role: 'assistant',
+                        content: cleanedFirstContent || null,
+                        tool_calls: validToolCalls
+                    });
+
+                    // 将所有工具结果添加到消息历史 (OpenAI标准格式)
+                    for (const toolResult of toolResults) {
+                        messages.push(toolResult);
+                    }
+
+                    console.log('发送的消息历史:', JSON.stringify(messages, null, 2));
+
+                    // 继续调用API,传递tools参数让DeepSeek可以继续调用工具
+                    console.log(`第${currentRound}轮: 使用工具结果继续请求...`);
+                    const continueResponse = await fetch(DEEPSEEK_API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                        },
+                        body: JSON.stringify({
+                            model: currentModel,
+                            messages: messages,
+                            temperature: 0.7,
+                            max_tokens: 4000,
+                            tools: tools, // 继续传递tools,让DeepSeek可以调用更多工具
+                            stream: true
+                        })
+                    });
+
+                    if (!continueResponse.ok) {
+                        throw new Error(`API错误 ${continueResponse.status}`);
+                    }
+
+                    const continueReader = continueResponse.body.getReader();
+                    fullContent = ''; // 重置内容
+                    let secondToolCallsArray = []; // 当前这轮调用的工具调用
+
+                    while (true) {
+                        const { done, value } = await continueReader.read();
+                        if (done) break;
+
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n').filter(line => line.trim());
+
+                        for (const line of lines) {
+                            if (!line.startsWith('data: ')) continue;
+                            const dataStr = line.substring(6);
+                            if (dataStr === '[DONE]') continue;
+
+                            try {
+                                const data = JSON.parse(dataStr);
+                                const delta = data.choices?.[0]?.delta;
+
+                                if (delta?.content) {
+                                    fullContent += delta.content;
+                                }
+
+                                // 检查是否返回了tool_calls (可能需要多轮)
+                                if (delta?.tool_calls) {
+                                    console.log(`第${currentRound}轮检测到tool_calls:`, delta.tool_calls);
+                                    for (const toolCall of delta.tool_calls) {
+                                        const index = toolCall.index;
+                                        if (!secondToolCallsArray[index]) {
+                                            secondToolCallsArray[index] = {
+                                                id: toolCall.id || '',
+                                                type: toolCall.type || 'function',
+                                                function: { name: '', arguments: '' }
+                                            };
+                                        }
+                                        if (toolCall.id) secondToolCallsArray[index].id = toolCall.id;
+                                        if (toolCall.type) secondToolCallsArray[index].type = toolCall.type;
+                                        if (toolCall.function?.name) secondToolCallsArray[index].function.name += toolCall.function.name;
+                                        if (toolCall.function?.arguments) secondToolCallsArray[index].function.arguments += toolCall.function.arguments;
+                                    }
+                                }
+                            } catch (e) {
+                                console.warn('解析chunk出错:', e);
+                            }
+                        }
+                    }
+
+                    console.log(`第${currentRound}轮API调用完成,返回内容:`, fullContent.substring(0, 300));
+                    console.log('返回内容长度:', fullContent.length);
+                    console.log('收集到的标准格式tool_calls:', secondToolCallsArray);
+
+                    // 将本轮收集到的tool_calls传递给下一轮
+                    toolCallsArray = secondToolCallsArray;
+
+                    // 继续循环检查是否还有工具调用
+                    } else {
+                        // 没有工具调用需要执行,结束循环
+                        console.log('本轮没有工具调用需要执行,结束循环');
+                        break;
+                    }
+                }
+
+                console.log('=== 准备返回结果 ===');
+                console.log('返回的内容长度:', fullContent.length);
+                console.log('返回的来源数量:', searchSources.length);
+                console.log('返回的内容预览(清理前):', fullContent.substring(0, 200));
+
+                // 清理DeepSeek特殊格式的工具调用标记
+                let cleanedContent = fullContent;
+
+                // 移除 <|tool▁calls▁begin|>...<|tool▁calls▁end|> 格式
+                cleanedContent = cleanedContent.replace(/<\|tool▁calls▁begin\|>[\s\S]*?<\|tool▁calls▁end\|>/g, '');
+
+                // 移除 <|tool▁call▁begin|>...<|tool▁call▁end|> 格式
+                cleanedContent = cleanedContent.replace(/<\|tool▁call▁begin\|>[\s\S]*?<\|tool▁call▁end\|>/g, '');
+
+                // 移除多余的空行
+                cleanedContent = cleanedContent.replace(/\n{3,}/g, '\n\n').trim();
+
+                console.log('清理后的内容预览:', cleanedContent.substring(0, 200));
+                console.log('清理后的内容长度:', cleanedContent.length);
+
+                return {
+                    content: cleanedContent,
+                    sources: searchSources
+                };
+                */
+
+            } catch (error) {
+                console.error('callDeepSeekAPIWithTools出错:', error);
+                throw error;
+            }
+        }
+
+        // 解析DeepSeek特殊格式的工具调用
+        function parseDeepSeekToolCalls(content) {
+            const toolCalls = [];
+
+            // 匹配格式: <|tool▁call▁begin|>function_name<|tool▁sep|>{"args": "value"}<|tool▁call▁end|>
+            const regex = /<\|tool▁call▁begin\|>(.*?)<\|tool▁sep\|>(.*?)<\|tool▁call▁end\|>/g;
+            let match;
+
+            while ((match = regex.exec(content)) !== null) {
+                const functionName = match[1].trim();
+                const argsJson = match[2].trim();
+
+                try {
+                    const args = JSON.parse(argsJson);
+                    toolCalls.push({
+                        name: functionName,
+                        arguments: args
+                    });
+                } catch (e) {
+                    console.warn('解析工具参数失败:', argsJson, e);
+                }
+            }
+
+            return toolCalls;
+        }
+
+        // 执行博查搜索
+        async function executeBochaSearch(query, count = 10) {
+            try {
+                console.log(`执行博查AI搜索: "${query}", 数量: ${count}`);
+
+                // 博查API key
+                const bochaApiKey = 'sk-cfb4999e8fa847afa9e64286c8fb8292';
+
+                const response = await fetch('https://api.bochaai.com/v1/ai-search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${bochaApiKey}`
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        freshness: 'oneDay',
+                        count: Math.min(count, 50)
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('博查搜索API错误:', response.status, errorText);
+                    throw new Error(`博查搜索失败: ${response.status} - ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log('博查搜索原始结果:', data);
+                console.log('messages内容:', data.messages);
+
+                // 解析博查AI搜索的结果
+                let results = [];
+
+                if (data.messages && Array.isArray(data.messages)) {
+                    // 找到type为'source'且content_type为'webpage'的message
+                    for (const msg of data.messages) {
+                        if (msg.type === 'source' && msg.content_type === 'webpage' && msg.content) {
+                            try {
+                                // content是一个JSON字符串,需要先解析
+                                const webpageData = JSON.parse(msg.content);
+                                console.log('解析webpage数据:', webpageData);
+
+                                // 从value数组中提取搜索结果
+                                if (webpageData.value && Array.isArray(webpageData.value)) {
+                                    for (const item of webpageData.value) {
+                                        results.push({
+                                            title: item.name || item.title || '',
+                                            url: item.url || '',
+                                            snippet: item.snippet || item.summary || '',
+                                            published_date: item.datePublished || item.dateLastCrawled || new Date().toISOString(),
+                                            site_name: item.siteName || ''
+                                        });
+                                    }
+                                }
+                            } catch (e) {
+                                console.warn('解析webpage content失败:', e);
+                            }
+                        }
+                    }
+                }
+
+                console.log('博查搜索解析后结果:', results);
+
+                return {
+                    query: query,
+                    count: results.length,
+                    results: results,
+                    summary: data.summary || null
+                };
+
+            } catch (error) {
+                console.error('博查搜索出错:', error);
+                return {
+                    query: query,
+                    count: 0,
+                    results: [],
+                    error: error.message
+                };
+            }
+        }
+
+        // 格式化报告内容
+        function formatReportContent(content, sources) {
+            // 将Markdown内容转换为HTML格式的报告
+            let html = '<h2 class="report-section-title">Deep Research 报告</h2>';
+            html += '<ul class="report-list">';
+
+            // 简单的段落分割
+            const paragraphs = content.split('\n\n').filter(p => p.trim());
+
+            paragraphs.forEach((para, index) => {
+                // 移除Markdown标记
+                para = para.replace(/^#+\s+/, '').replace(/\*\*/g, '').trim();
+
+                if (para) {
+                    html += '<li class="report-list-item">';
+
+                    // 如果段落较长，提取标题
+                    const lines = para.split('\n');
+                    if (lines.length > 0 && lines[0].length < 100) {
+                        html += `<div class="report-item-title">${lines[0]}</div>`;
+                        if (lines.length > 1) {
+                            html += `<div class="report-item-content">${lines.slice(1).join(' ')}</div>`;
+                        }
+                    } else {
+                        html += `<div class="report-item-content">${para}</div>`;
+                    }
+
+                    html += '</li>';
+                }
+            });
+
+            html += '</ul>';
+
+            // 添加来源信息
+            if (sources && sources.length > 0) {
+                html += '<div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f0f0f0;">';
+                html += '<h3 style="font-size: 14px; font-weight: 600; color: #666; margin-bottom: 12px;">📚 参考来源</h3>';
+                sources.forEach((source, idx) => {
+                    html += `<a href="${source.url}" class="report-item-source" target="_blank">${source.title || '来源 ' + (idx + 1)}</a> `;
+                });
+                html += '</div>';
+            }
+
+            return html;
         }
 
         async function sendWritingMessage() {
@@ -3237,6 +6259,153 @@
         function escapeRegExp(string) {
             return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
+
+        // ==================== HR-Agent 功能 ====================
+        let hrConversationHistory = [];
+
+        async function sendHRMessage() {
+            const input = document.getElementById('hrInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // 清空输入框
+            input.value = '';
+
+            // 移除欢迎消息
+            const welcomeMessage = document.querySelector('.welcome-message');
+            if (welcomeMessage) {
+                welcomeMessage.remove();
+            }
+
+            // 显示用户消息
+            appendHRMessage('user', message);
+
+            // 添加到对话历史
+            hrConversationHistory.push({
+                role: 'user',
+                content: message
+            });
+
+            // 显示AI思考中
+            const thinkingId = 'hr-thinking-' + Date.now();
+            appendHRMessage('assistant', '<div class="thinking-indicator">正在思考...</div>', thinkingId);
+
+            try {
+                // 构建系统提示
+                const systemPrompt = `你是一个专业的人力资源助手HR-Agent。你擅长解答关于招聘、培训、薪酬福利、绩效管理、劳动法规、员工关系等HR相关问题。请用专业、友好的语气回答用户的问题,并提供实用的建议。`;
+
+                const messages = [
+                    { role: 'system', content: systemPrompt },
+                    ...hrConversationHistory
+                ];
+
+                const response = await fetch(DEEPSEEK_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek-chat',
+                        messages: messages,
+                        stream: true
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.status}`);
+                }
+
+                // 移除思考提示
+                const thinkingElement = document.getElementById(thinkingId);
+                if (thinkingElement) {
+                    thinkingElement.remove();
+                }
+
+                // 创建AI消息容器
+                const assistantMsgId = 'hr-msg-' + Date.now();
+                appendHRMessage('assistant', '', assistantMsgId);
+                const assistantMsgElement = document.getElementById(assistantMsgId);
+                const contentDiv = assistantMsgElement.querySelector('.hr-message-content');
+
+                let fullResponse = '';
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') continue;
+
+                            try {
+                                const json = JSON.parse(data);
+                                const content = json.choices[0]?.delta?.content || '';
+                                if (content) {
+                                    fullResponse += content;
+                                    contentDiv.innerHTML = marked.parse(fullResponse);
+
+                                    // 滚动到底部
+                                    const messagesContainer = document.getElementById('hrMessages');
+                                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                                }
+                            } catch (e) {
+                                // 忽略解析错误
+                            }
+                        }
+                    }
+                }
+
+                // 添加到对话历史
+                hrConversationHistory.push({
+                    role: 'assistant',
+                    content: fullResponse
+                });
+
+            } catch (error) {
+                console.error('HR-Agent error:', error);
+                const thinkingElement = document.getElementById(thinkingId);
+                if (thinkingElement) {
+                    thinkingElement.remove();
+                }
+                appendHRMessage('assistant', '抱歉,处理您的请求时出现了错误。请稍后再试。');
+            }
+        }
+
+        function appendHRMessage(role, content, id) {
+            const messagesContainer = document.getElementById('hrMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `hr-message hr-message-${role}`;
+            if (id) messageDiv.id = id;
+
+            const avatar = role === 'user' ? '👤' : '👔';
+            const roleName = role === 'user' ? '您' : 'HR-Agent';
+
+            messageDiv.innerHTML = `
+                <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                    <div style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: ${role === 'user' ? '#5470ff' : '#10b981'}; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                        ${avatar}
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 13px; font-weight: 500; color: #666; margin-bottom: 6px;">${roleName}</div>
+                        <div class="hr-message-content" style="font-size: 14px; line-height: 1.6; color: #333; word-wrap: break-word;">
+                            ${content}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
     </script>
 </body>
 </html>
