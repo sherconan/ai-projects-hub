@@ -2703,7 +2703,7 @@
                 <!-- 特殊功能区分隔线 -->
                 <div class="nav-separator"></div>
 
-                <div class="nav-item special-function" data-tooltip="个人知识库">
+                <div class="nav-item special-function" data-page="knowledge-base" data-tooltip="个人知识库">
                     <img src="images/书籍1_book-one@3x.png" width="16" height="16" style="display: inline-block; vertical-align: middle;">
                     个人知识库
                 </div>
@@ -3326,6 +3326,52 @@
             </div>
         </div>
 
+        <!-- 知识库管理页面 -->
+        <div class="page" id="knowledgeBasePage" style="flex-direction: column;">
+            <div class="kb-container" style="flex: 1; display: flex; flex-direction: column; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%;">
+                <div class="kb-header" style="margin-bottom: 32px;">
+                    <h1 style="font-size: 28px; font-weight: 600; color: #1a1a1a; margin-bottom: 12px;">📚 智启知识库</h1>
+                    <p style="font-size: 14px; color: #666;">管理您的知识库文档,支持智能检索和问答</p>
+                </div>
+
+                <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+                    <button onclick="document.getElementById('kbFileInput').click()" style="padding: 10px 20px; background: linear-gradient(135deg, #5470ff 0%, #667eea 100%); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;">
+                        📤 上传文档
+                    </button>
+                    <input type="file" id="kbFileInput" accept=".txt,.md,.pdf,.doc,.docx" multiple style="display: none;" onchange="handleKBFileUpload(event)">
+                    <button onclick="refreshKBList()" style="padding: 10px 20px; background: white; color: #5470ff; border: 1px solid #5470ff; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;">
+                        🔄 刷新列表
+                    </button>
+                    <input type="text" id="kbSearchInput" placeholder="搜索文档..." style="flex: 1; padding: 10px 16px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px;" onkeyup="searchKBDocuments()">
+                </div>
+
+                <div class="kb-stats" style="display: flex; gap: 24px; margin-bottom: 24px; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+                    <div style="flex: 1;">
+                        <div style="font-size: 24px; font-weight: 600; color: #5470ff;" id="kbTotalDocs">0</div>
+                        <div style="font-size: 13px; color: #666; margin-top: 4px;">总文档数</div>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 24px; font-weight: 600; color: #10b981;" id="kbTotalSize">0 KB</div>
+                        <div style="font-size: 13px; color: #666; margin-top: 4px;">总大小</div>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 24px; font-weight: 600; color: #f59e0b;" id="kbLastUpdate">-</div>
+                        <div style="font-size: 13px; color: #666; margin-top: 4px;">最后更新</div>
+                    </div>
+                </div>
+
+                <div class="kb-documents" id="kbDocuments" style="flex: 1; overflow-y: auto; background: white; border-radius: 12px; border: 1px solid #e5e5e5; padding: 20px;">
+                    <div style="text-align: center; padding: 60px 20px; color: #999;">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-bottom: 16px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <polyline points="14 2 14 8 20 8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <p style="font-size: 14px;">暂无文档,点击上传按钮添加文档</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <!-- 文件选择弹窗 -->
     <div class="modal-overlay" id="fileModal">
         <div class="modal-content">
@@ -3510,6 +3556,9 @@
                 }
             } else if (page === 'hr-agent') {
                 document.getElementById('hrAgentPage').classList.add('active');
+            } else if (page === 'knowledge-base') {
+                document.getElementById('knowledgeBasePage').classList.add('active');
+                initKnowledgeBase();
             } else {
                 document.getElementById('homePage').classList.add('active');
             }
@@ -3548,6 +3597,9 @@
                 item.classList.remove('active');
             });
             document.querySelector('.new-chat')?.classList.add('active');
+
+            // 加载知识库数据
+            loadKnowledgeBase();
         });
 
         // ==================== 首页功能切换 ====================
@@ -6404,6 +6456,232 @@ ${searchResultsText}
 
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // ==================== 知识库管理功能 ====================
+        let knowledgeBase = [];
+
+        // 初始化知识库
+        function initKnowledgeBase() {
+            loadKnowledgeBase();
+            refreshKBList();
+        }
+
+        // 从localStorage加载知识库
+        function loadKnowledgeBase() {
+            const stored = localStorage.getItem('intelligenceKB');
+            if (stored) {
+                knowledgeBase = JSON.parse(stored);
+            }
+        }
+
+        // 保存知识库到localStorage
+        function saveKnowledgeBase() {
+            localStorage.setItem('intelligenceKB', JSON.stringify(knowledgeBase));
+        }
+
+        // 处理文件上传
+        async function handleKBFileUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            for (let file of files) {
+                try {
+                    const content = await readFileContent(file);
+                    const doc = {
+                        id: Date.now() + Math.random(),
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        content: content,
+                        uploadTime: new Date().toISOString(),
+                        category: guessCategory(file.name)
+                    };
+
+                    knowledgeBase.push(doc);
+                    console.log('文档已添加:', doc.name);
+                } catch (error) {
+                    console.error('读取文件失败:', file.name, error);
+                    alert(`文件 "${file.name}" 读取失败: ${error.message}`);
+                }
+            }
+
+            saveKnowledgeBase();
+            refreshKBList();
+            event.target.value = ''; // 清空input
+        }
+
+        // 读取文件内容
+        function readFileContent(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    resolve(e.target.result);
+                };
+
+                reader.onerror = () => {
+                    reject(new Error('文件读取失败'));
+                };
+
+                // 根据文件类型选择读取方式
+                if (file.type === 'text/plain' || file.name.endsWith('.md') || file.name.endsWith('.txt')) {
+                    reader.readAsText(file);
+                } else {
+                    // 对于其他类型,先提示用户只支持文本文件
+                    reject(new Error('暂时只支持 TXT 和 MD 格式文档'));
+                }
+            });
+        }
+
+        // 根据文件名猜测分类
+        function guessCategory(filename) {
+            const name = filename.toLowerCase();
+            if (name.includes('dify')) return '开发平台/Dify';
+            if (name.includes('deepseek')) return 'AI模型/DeepSeek';
+            if (name.includes('ocr')) return '基础能力与工具/OCR识别';
+            if (name.includes('asr') || name.includes('语音')) return '基础能力与工具/ASR语音识别';
+            if (name.includes('解析') || name.includes('parse')) return '基础能力与工具/文档解析';
+            return '未分类';
+        }
+
+        // 刷新文档列表
+        function refreshKBList() {
+            const container = document.getElementById('kbDocuments');
+            const searchTerm = document.getElementById('kbSearchInput').value.toLowerCase();
+
+            // 过滤文档
+            const filteredDocs = knowledgeBase.filter(doc =>
+                doc.name.toLowerCase().includes(searchTerm) ||
+                doc.content.toLowerCase().includes(searchTerm) ||
+                doc.category.toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredDocs.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: #999;">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin-bottom: 16px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <polyline points="14 2 14 8 20 8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <p style="font-size: 14px;">${searchTerm ? '没有找到匹配的文档' : '暂无文档,点击上传按钮添加文档'}</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = filteredDocs.map(doc => `
+                    <div style="padding: 16px; border: 1px solid #e5e5e5; border-radius: 8px; margin-bottom: 12px; background: #fafafa;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">📄 ${doc.name}</div>
+                                <div style="font-size: 12px; color: #666;">
+                                    <span style="margin-right: 12px;">📁 ${doc.category}</span>
+                                    <span style="margin-right: 12px;">📊 ${formatFileSize(doc.size)}</span>
+                                    <span>🕐 ${formatDate(doc.uploadTime)}</span>
+                                </div>
+                            </div>
+                            <button onclick="deleteKBDoc('${doc.id}')" style="padding: 6px 12px; background: #fff; color: #ff4d4f; border: 1px solid #ff4d4f; border-radius: 6px; font-size: 12px; cursor: pointer;">删除</button>
+                        </div>
+                        <div style="font-size: 13px; color: #666; line-height: 1.6; max-height: 60px; overflow: hidden; text-overflow: ellipsis;">
+                            ${doc.content.substring(0, 200)}${doc.content.length > 200 ? '...' : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // 更新统计信息
+            updateKBStats();
+        }
+
+        // 更新统计信息
+        function updateKBStats() {
+            const totalDocs = knowledgeBase.length;
+            const totalSize = knowledgeBase.reduce((sum, doc) => sum + doc.size, 0);
+            const lastUpdate = knowledgeBase.length > 0 ?
+                knowledgeBase[knowledgeBase.length - 1].uploadTime : null;
+
+            document.getElementById('kbTotalDocs').textContent = totalDocs;
+            document.getElementById('kbTotalSize').textContent = formatFileSize(totalSize);
+            document.getElementById('kbLastUpdate').textContent = lastUpdate ? formatDate(lastUpdate) : '-';
+        }
+
+        // 删除文档
+        function deleteKBDoc(docId) {
+            if (!confirm('确定要删除这个文档吗?')) return;
+
+            knowledgeBase = knowledgeBase.filter(doc => doc.id != docId);
+            saveKnowledgeBase();
+            refreshKBList();
+        }
+
+        // 搜索文档
+        function searchKBDocuments() {
+            refreshKBList();
+        }
+
+        // 在知识库中检索相关内容
+        function searchKnowledge(query) {
+            const results = [];
+            const queryLower = query.toLowerCase();
+
+            for (let doc of knowledgeBase) {
+                const contentLower = doc.content.toLowerCase();
+                if (contentLower.includes(queryLower) || doc.name.toLowerCase().includes(queryLower)) {
+                    // 找到匹配的段落
+                    const index = contentLower.indexOf(queryLower);
+                    const start = Math.max(0, index - 100);
+                    const end = Math.min(doc.content.length, index + 300);
+                    const snippet = doc.content.substring(start, end);
+
+                    results.push({
+                        docName: doc.name,
+                        category: doc.category,
+                        snippet: snippet,
+                        relevance: calculateRelevance(doc.content, query)
+                    });
+                }
+            }
+
+            // 按相关度排序
+            results.sort((a, b) => b.relevance - a.relevance);
+            return results.slice(0, 3); // 返回前3个最相关的结果
+        }
+
+        // 计算相关度(简单实现)
+        function calculateRelevance(content, query) {
+            const queryTerms = query.toLowerCase().split(' ');
+            const contentLower = content.toLowerCase();
+            let score = 0;
+
+            for (let term of queryTerms) {
+                const regex = new RegExp(term, 'gi');
+                const matches = contentLower.match(regex);
+                if (matches) {
+                    score += matches.length;
+                }
+            }
+
+            return score;
+        }
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // 格式化日期
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            const now = new Date();
+            const diff = now - date;
+
+            if (diff < 60000) return '刚刚';
+            if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前';
+            if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前';
+            if (diff < 604800000) return Math.floor(diff / 86400000) + '天前';
+
+            return date.toLocaleDateString('zh-CN');
         }
 
     </script>

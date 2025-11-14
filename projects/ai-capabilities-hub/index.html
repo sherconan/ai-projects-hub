@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>九章智启 - AI能力整合平台</title>
+    <title>九章智启 - AI能力平台-智能团队</title>
     <style>
         * {
             margin: 0;
@@ -13,30 +13,218 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            background: #f5f7fa;
             min-height: 100vh;
-            padding: 20px;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 400px;
-            background: linear-gradient(135deg, rgba(145, 14, 14, 0.08) 0%, rgba(190, 140, 75, 0.06) 100%);
-            z-index: -1;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            overflow: hidden;
         }
 
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* 顶部导航 */
+        /* 左侧导航栏 */
+        .sidebar {
+            width: 280px;
+            background: #1e293b;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, #910E0E 0%, #7a0b0b 100%);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .sidebar-logo-text h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .sidebar-logo-text p {
+            font-size: 11px;
+            opacity: 0.8;
+            margin: 2px 0 0 0;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 0;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        /* 一级菜单项 */
+        .nav-section {
+            margin-bottom: 4px;
+        }
+
+        .nav-section-title {
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .nav-section-title:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-section-title.active {
+            background: rgba(145, 14, 14, 0.3);
+            color: #fff;
+        }
+
+        .nav-section-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .nav-section-arrow {
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .nav-section.expanded .nav-section-arrow {
+            transform: rotate(90deg);
+        }
+
+        /* 二级菜单容器 */
+        .nav-subsection {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-section.expanded .nav-subsection {
+            max-height: 2000px;
+        }
+
+        /* 二级菜单包装器 */
+        .nav-subsection-wrapper {
+            /* 无额外样式,仅用于组织结构 */
+        }
+
+        /* 二级菜单项 */
+        .nav-subsection-item {
+            padding: 8px 20px 8px 48px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .nav-subsection-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .nav-subsection-item.active {
+            background: rgba(145, 14, 14, 0.2);
+            color: #fff;
+            border-left: 3px solid #910E0E;
+            padding-left: 45px;
+        }
+
+        .nav-subsection-arrow {
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+
+        .nav-subsection-item.expanded .nav-subsection-arrow {
+            transform: rotate(90deg);
+        }
+
+        /* 三级菜单容器 */
+        .nav-cards {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-subsection-wrapper:has(.nav-subsection-item.expanded) .nav-cards {
+            max-height: 1000px;
+        }
+
+        /* 三级菜单项（具体卡片） */
+        .nav-card-item {
+            padding: 6px 20px 6px 64px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-card-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-card-item.active {
+            color: #fff;
+            background: rgba(145, 14, 14, 0.15);
+        }
+
+        /* 顶部导航 - 隐藏原header */
         header {
+            display: none;
+        }
+
+        /* 原来的顶部导航样式保留但隐藏 */
+        header.original {
             background: white;
             backdrop-filter: blur(10px);
             padding: 28px 48px;
@@ -119,21 +307,49 @@
 
         /* 主内容区 */
         .main-content {
-            max-width: 1200px;
-            margin: 0 auto;
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+            background: #f5f7fa;
+            padding: 24px 30px;
         }
 
-        /* 分类标签栏 */
+        .main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: #e5e7eb;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 4px;
+        }
+
+        .main-content::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+
+        .content-header {
+            margin-bottom: 32px;
+        }
+
+        .content-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .content-subtitle {
+            font-size: 16px;
+            color: #64748b;
+        }
+
+        /* 分类标签栏 - 隐藏 */
         .category-tabs {
-            background: white;
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 24px 32px;
-            margin-bottom: 40px;
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            position: relative;
-            z-index: 100;
+            display: none;
         }
 
         .category-list {
@@ -247,7 +463,7 @@
             border-radius: 0;
             padding: 0;
             box-shadow: none;
-            margin-top: 60px;
+            margin-top: 45px;
         }
 
         .section:first-child {
@@ -255,13 +471,13 @@
         }
 
         .section-title {
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 800;
             color: #1e293b;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             letter-spacing: -0.5px;
         }
 
@@ -276,17 +492,17 @@
         /* 卡片网格 */
         .card-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-            max-width: 1100px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 100%;
             margin: 0 auto;
         }
 
         /* 平台卡片 */
         .platform-card {
             background: white;
-            border-radius: 20px;
-            padding: 32px;
+            border-radius: 16px;
+            padding: 20px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
@@ -320,20 +536,20 @@
         .card-header {
             display: flex;
             align-items: center;
-            gap: 18px;
-            margin-bottom: 20px;
-            padding-bottom: 18px;
+            gap: 14px;
+            margin-bottom: 14px;
+            padding-bottom: 14px;
             border-bottom: 1px solid #f1f5f9;
         }
 
         .card-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 16px;
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 24px;
             flex-shrink: 0;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
             transition: all 0.3s;
@@ -345,7 +561,7 @@
         }
 
         .card-title {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 700;
             color: #1e293b;
             letter-spacing: -0.3px;
@@ -353,24 +569,24 @@
 
         .card-description {
             color: #64748b;
-            font-size: 15px;
-            line-height: 1.7;
-            margin-bottom: 18px;
-            min-height: 75px;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            min-height: 50px;
         }
 
         .card-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 14px;
         }
 
         .tag {
-            padding: 6px 14px;
+            padding: 4px 10px;
             background: #f8fafc;
-            border-radius: 12px;
-            font-size: 12px;
+            border-radius: 8px;
+            font-size: 11px;
             color: #475569;
             font-weight: 500;
             border: 1px solid #e2e8f0;
@@ -378,19 +594,19 @@
 
         .card-actions {
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            padding-top: 15px;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
             border-top: 1px solid #f0f0f0;
         }
 
         .btn {
             flex: 1;
-            padding: 12px 20px;
+            padding: 10px 16px;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             transition: all 0.3s;
             text-align: center;
@@ -704,13 +920,14 @@
         /* 对话框容器 */
         .chat-container {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 400px;
-            height: 600px;
+            bottom: 20px;
+            right: 20px;
+            width: 380px;
+            height: 500px;
+            max-height: calc(100vh - 100px);
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
-            border-radius: 20px;
+            border-radius: 16px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
             display: none;
             flex-direction: column;
@@ -1001,8 +1218,31 @@
 </head>
 <body>
     <div class="container">
-        <!-- 顶部导航 -->
-        <header>
+        <!-- 左侧导航栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">🤖</div>
+                    <div class="sidebar-logo-text">
+                        <h2>九章智启</h2>
+                        <p>AI能力平台-智能团队</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav">
+                <!-- 导航内容将由JavaScript动态生成 -->
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content" id="mainContent">
+            <div class="content-header">
+                <h1 class="content-title">九章智启 AI能力平台-智能团队</h1>
+                <p class="content-subtitle">打造一站式AI开发与应用生态</p>
+            </div>
+
+        <!-- 顶部导航（隐藏） -->
+        <header style="display:none;">
             <div class="logo">
                 <div class="logo-icon">
                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -1123,15 +1363,15 @@
                     <li class="category-item" data-category="mcp-servers">MCP Server</li>
 
                     <li class="category-item" data-category="models">AI模型</li>
-                    <li class="category-item" data-category="products">AI产品</li>
+                    <li class="category-item" data-category="products">上线产品</li>
                 </ul>
             </div>
 
             <!-- 内容区域 -->
             <div class="content-area">
-                <!-- AI产品 -->
+                <!-- 上线产品 -->
                 <section class="section" id="products">
-                    <h2 class="section-title">🎯 AI产品</h2>
+                    <h2 class="section-title">🎯 上线产品</h2>
                     <div class="card-grid">
                         <!-- 小金智能助手 -->
                         <div class="platform-card" data-category="products">
@@ -1341,9 +1581,9 @@
                     </div>
                 </section>
 
-                <!-- AI模型中心 -->
+                <!-- 模型中心 -->
                 <section class="section" id="models">
-                    <h2 class="section-title">🧠 AI模型中心</h2>
+                    <h2 class="section-title">🧠 模型中心</h2>
                     <div class="card-grid">
                         <!-- DeepSeek V3 -->
                         <div class="platform-card" data-category="models">
@@ -1560,9 +1800,9 @@
                     </div>
                 </section>
 
-                <!-- 开发平台与工具 -->
+                <!-- 应用开发平台 -->
                 <section class="section" id="platforms">
-                    <h2 class="section-title">🛠️ 开发平台与工具</h2>
+                    <h2 class="section-title">🛠️ 应用开发平台</h2>
                     <div class="card-grid" id="platformGrid">
                         <!-- 腾讯ADP -->
                         <div class="platform-card" data-category="platforms">
@@ -2495,51 +2735,281 @@
                                 <button class="btn btn-secondary" onclick="alert('DeepSeek OCR\n\n核心特性:\n• 视觉文本压缩: 7-20倍高效压缩\n• 多语言支持: 覆盖近100种语言\n• 复杂内容识别: 表格、数学公式、化学式、几何图形\n• 灵活输出: 支持Markdown和纯文本格式\n• 高准确率: 10倍压缩比下达97%准确率\n\n技术架构:\n• DeepEncoder编码器: 将高分辨率文档压缩为视觉标记\n• MoE解码器: 高效处理大规模文档生成\n• 每天可生成超过20万页训练数据')">查看详情</button>
                             </div>
                         </div>
+
+                        <!-- 自研OCR -->
+                        <div class="platform-card" data-category="capabilities">
+                            <div class="card-header">
+                                <div class="card-icon" style="background: linear-gradient(135deg, #910E0E 0%, #be8c4b 100%);">
+                                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
+                                        <defs>
+                                            <linearGradient id="customOcrGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                                                <stop offset="100%" style="stop-color:#ffe8e0;stop-opacity:1" />
+                                            </linearGradient>
+                                        </defs>
+                                        <!-- 文档扫描图标 -->
+                                        <rect x="30" y="25" width="40" height="50" rx="3" fill="url(#customOcrGradient)"/>
+                                        <line x1="38" y1="35" x2="62" y2="35" stroke="#910E0E" stroke-width="2"/>
+                                        <line x1="38" y1="45" x2="62" y2="45" stroke="#910E0E" stroke-width="2"/>
+                                        <line x1="38" y1="55" x2="55" y2="55" stroke="#910E0E" stroke-width="2"/>
+                                        <line x1="38" y1="65" x2="58" y2="65" stroke="#910E0E" stroke-width="2"/>
+                                        <!-- 扫描线 -->
+                                        <line x1="28" y1="50" x2="72" y2="50" stroke="#be8c4b" stroke-width="2" opacity="0.6"/>
+                                        <circle cx="28" cy="50" r="3" fill="#be8c4b" opacity="0.8"/>
+                                        <circle cx="72" cy="50" r="3" fill="#be8c4b" opacity="0.8"/>
+                                    </svg>
+                                </div>
+                                <h3 class="card-title">自研OCR</h3>
+                            </div>
+                            <p class="card-description">内部自研OCR识别系统,针对业务场景深度优化,支持定制化识别规则和专有格式文档</p>
+                            <div class="card-tags">
+                                <span class="tag">定制化</span>
+                                <span class="tag">业务优化</span>
+                                <span class="tag">私有部署</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-primary" onclick="window.open('#', '_blank')">立即使用</button>
+                                <button class="btn btn-secondary" onclick="alert('自研OCR功能介绍')">查看详情</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- ASR语音识别 -->
                     <h3 style="font-size: 20px; font-weight: 700; color: #475569; margin: 50px 0 20px 0; padding-left: 15px; border-left: 4px solid #910E0E;">🎙️ ASR语音识别</h3>
                     <div class="card-grid">
-                        <!-- 可以添加ASR相关的卡片,这里先留空框架 -->
+                        <!-- 腾讯云ASR -->
                         <div class="platform-card" data-category="capabilities">
                             <div class="card-header">
-                                <div class="card-icon" style="background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%);">
+                                <div class="card-icon" style="background: linear-gradient(135deg, #0052D9 0%, #0041B8 100%);">
                                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
                                         <defs>
-                                            <linearGradient id="asrGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <linearGradient id="tencentAsrGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                                 <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-                                                <stop offset="100%" style="stop-color:#f4ecf7;stop-opacity:1" />
+                                                <stop offset="100%" style="stop-color:#e0edff;stop-opacity:1" />
                                             </linearGradient>
                                         </defs>
-                                        <!-- 麦克风图标 -->
-                                        <rect x="43" y="30" width="14" height="25" rx="7" fill="url(#asrGradient)"/>
-                                        <path d="M 35,50 Q 35,65 50,65 Q 65,65 65,50" stroke="url(#asrGradient)" stroke-width="3" fill="none"/>
-                                        <line x1="50" y1="65" x2="50" y2="75" stroke="url(#asrGradient)" stroke-width="3"/>
-                                        <line x1="42" y1="75" x2="58" y2="75" stroke="url(#asrGradient)" stroke-width="3"/>
-                                        <!-- 声波 -->
-                                        <path d="M 25,45 Q 28,40 25,35" stroke="#9B59B6" stroke-width="2" fill="none" opacity="0.6"/>
-                                        <path d="M 75,45 Q 72,40 75,35" stroke="#9B59B6" stroke-width="2" fill="none" opacity="0.6"/>
+                                        <rect x="43" y="30" width="14" height="25" rx="7" fill="url(#tencentAsrGradient)"/>
+                                        <path d="M 35,50 Q 35,65 50,65 Q 65,65 65,50" stroke="url(#tencentAsrGradient)" stroke-width="3" fill="none"/>
+                                        <line x1="50" y1="65" x2="50" y2="75" stroke="url(#tencentAsrGradient)" stroke-width="3"/>
+                                        <circle cx="50" cy="50" r="25" stroke="#0052D9" stroke-width="2" fill="none" opacity="0.3"/>
                                     </svg>
                                 </div>
-                                <h3 class="card-title">语音识别服务</h3>
+                                <h3 class="card-title">腾讯云ASR</h3>
                             </div>
-                            <p class="card-description">提供高精度语音转文字服务,支持实时识别、离线识别、多语种识别等能力</p>
+                            <p class="card-description">腾讯云语音识别服务,支持实时识别、录音文件识别、热词定制等功能</p>
                             <div class="card-tags">
                                 <span class="tag">实时识别</span>
+                                <span class="tag">热词定制</span>
+                                <span class="tag">中文优化</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-primary" onclick="window.open('https://cloud.tencent.com/product/asr', '_blank')">立即使用</button>
+                                <button class="btn btn-secondary" onclick="alert('腾讯云ASR功能介绍')">查看详情</button>
+                            </div>
+                        </div>
+
+                        <!-- 阿里云ASR -->
+                        <div class="platform-card" data-category="capabilities">
+                            <div class="card-header">
+                                <div class="card-icon" style="background: linear-gradient(135deg, #FF6A00 0%, #EE5A00 100%);">
+                                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
+                                        <defs>
+                                            <linearGradient id="aliAsrGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                                                <stop offset="100%" style="stop-color:#ffebe0;stop-opacity:1" />
+                                            </linearGradient>
+                                        </defs>
+                                        <rect x="43" y="30" width="14" height="25" rx="7" fill="url(#aliAsrGradient)"/>
+                                        <path d="M 35,50 Q 35,65 50,65 Q 65,65 65,50" stroke="url(#aliAsrGradient)" stroke-width="3" fill="none"/>
+                                        <line x1="50" y1="65" x2="50" y2="75" stroke="url(#aliAsrGradient)" stroke-width="3"/>
+                                        <path d="M 30,45 L 40,50 L 30,55 M 70,45 L 60,50 L 70,55" stroke="#FF6A00" stroke-width="2" fill="none"/>
+                                    </svg>
+                                </div>
+                                <h3 class="card-title">阿里云ASR</h3>
+                            </div>
+                            <p class="card-description">阿里云智能语音识别,支持多场景、多语种、高并发的语音转文字服务</p>
+                            <div class="card-tags">
+                                <span class="tag">多场景</span>
                                 <span class="tag">多语种</span>
-                                <span class="tag">高精度</span>
+                                <span class="tag">高并发</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-primary" onclick="window.open('https://ai.aliyun.com/nls/asr', '_blank')">立即使用</button>
+                                <button class="btn btn-secondary" onclick="alert('阿里云ASR功能介绍')">查看详情</button>
+                            </div>
+                        </div>
+
+                        <!-- Whisper -->
+                        <div class="platform-card" data-category="capabilities">
+                            <div class="card-header">
+                                <div class="card-icon" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
+                                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
+                                        <defs>
+                                            <linearGradient id="whisperGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                                                <stop offset="100%" style="stop-color:#d1fae5;stop-opacity:1" />
+                                            </linearGradient>
+                                        </defs>
+                                        <rect x="43" y="30" width="14" height="25" rx="7" fill="url(#whisperGradient)"/>
+                                        <path d="M 35,50 Q 35,65 50,65 Q 65,65 65,50" stroke="url(#whisperGradient)" stroke-width="3" fill="none"/>
+                                        <line x1="50" y1="65" x2="50" y2="75" stroke="url(#whisperGradient)" stroke-width="3"/>
+                                        <circle cx="30" cy="45" r="3" fill="#10B981" opacity="0.6"/>
+                                        <circle cx="70" cy="45" r="3" fill="#10B981" opacity="0.6"/>
+                                        <circle cx="30" cy="55" r="2" fill="#10B981" opacity="0.4"/>
+                                        <circle cx="70" cy="55" r="2" fill="#10B981" opacity="0.4"/>
+                                    </svg>
+                                </div>
+                                <h3 class="card-title">Whisper</h3>
+                            </div>
+                            <p class="card-description">OpenAI开源语音识别模型,支持多语言转录、语音翻译,可本地部署</p>
+                            <div class="card-tags">
+                                <span class="tag">开源</span>
+                                <span class="tag">多语言</span>
+                                <span class="tag">本地部署</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-primary" onclick="window.open('https://github.com/openai/whisper', '_blank')">立即使用</button>
+                                <button class="btn btn-secondary" onclick="alert('Whisper功能介绍')">查看详情</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TTS语音合成 -->
+                    <h3 style="font-size: 20px; font-weight: 700; color: #475569; margin: 50px 0 20px 0; padding-left: 15px; border-left: 4px solid #910E0E;">🔊 TTS语音合成</h3>
+                    <div class="card-grid">
+                        <!-- 腾讯云TTS -->
+                        <div class="platform-card" data-category="capabilities">
+                            <div class="card-header">
+                                <div class="card-icon" style="background: linear-gradient(135deg, #0052D9 0%, #0041B8 100%);">
+                                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
+                                        <circle cx="50" cy="50" r="20" fill="#ffffff" opacity="0.3"/>
+                                        <path d="M 40,40 L 40,60 L 55,50 Z" fill="#ffffff"/>
+                                        <circle cx="50" cy="50" r="25" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.4"/>
+                                        <circle cx="50" cy="50" r="30" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.2"/>
+                                    </svg>
+                                </div>
+                                <h3 class="card-title">腾讯云TTS</h3>
+                            </div>
+                            <p class="card-description">腾讯云语音合成服务,支持多音色、多情感、自定义音色等功能</p>
+                            <div class="card-tags">
+                                <span class="tag">多音色</span>
+                                <span class="tag">情感合成</span>
+                                <span class="tag">自定义</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-primary" onclick="window.open('https://cloud.tencent.com/product/tts', '_blank')">立即使用</button>
+                                <button class="btn btn-secondary" onclick="alert('腾讯云TTS功能介绍')">查看详情</button>
+                            </div>
+                        </div>
+
+                        <!-- MiniMax TTS -->
+                        <div class="platform-card" data-category="capabilities">
+                            <div class="card-header">
+                                <div class="card-icon" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
+                                        <circle cx="50" cy="50" r="20" fill="#ffffff" opacity="0.3"/>
+                                        <path d="M 40,40 L 40,60 L 55,50 Z" fill="#ffffff"/>
+                                        <path d="M 60,35 Q 70,50 60,65" stroke="#ffffff" stroke-width="2" fill="none"/>
+                                        <path d="M 65,30 Q 78,50 65,70" stroke="#ffffff" stroke-width="2" fill="none"/>
+                                    </svg>
+                                </div>
+                                <h3 class="card-title">MiniMax TTS</h3>
+                            </div>
+                            <p class="card-description">MiniMax语音合成,支持高质量语音生成,音色自然流畅</p>
+                            <div class="card-tags">
+                                <span class="tag">高质量</span>
+                                <span class="tag">自然流畅</span>
+                                <span class="tag">AI驱动</span>
                             </div>
                             <div class="card-actions">
                                 <button class="btn btn-primary" onclick="window.open('#', '_blank')">立即使用</button>
-                                <button class="btn btn-secondary" onclick="alert('ASR语音识别功能介绍')">查看详情</button>
+                                <button class="btn btn-secondary" onclick="alert('MiniMax TTS功能介绍')">查看详情</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 翻译服务 -->
+                    <h3 style="font-size: 20px; font-weight: 700; color: #475569; margin: 50px 0 20px 0; padding-left: 15px; border-left: 4px solid #910E0E;">🌐 翻译服务</h3>
+                    <div class="card-grid">
+                        <!-- DeepL -->
+                        <div class="platform-card" data-category="capabilities">
+                            <div class="card-header">
+                                <div class="card-icon" style="background: linear-gradient(135deg, #0F2B46 0%, #042940 100%);">
+                                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
+                                        <text x="50" y="60" font-size="40" fill="#ffffff" text-anchor="middle" font-weight="bold">A</text>
+                                        <path d="M 35,45 L 45,45 M 55,45 L 65,45" stroke="#ffffff" stroke-width="2"/>
+                                        <path d="M 50,40 L 53,45 L 50,50 M 50,40 L 47,45 L 50,50" stroke="#ffffff" stroke-width="2" fill="none"/>
+                                    </svg>
+                                </div>
+                                <h3 class="card-title">DeepL</h3>
+                            </div>
+                            <p class="card-description">DeepL翻译,以精准自然的翻译质量著称,支持多语言互译</p>
+                            <div class="card-tags">
+                                <span class="tag">高质量</span>
+                                <span class="tag">自然流畅</span>
+                                <span class="tag">多语言</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-primary" onclick="window.open('https://www.deepl.com', '_blank')">立即使用</button>
+                                <button class="btn btn-secondary" onclick="alert('DeepL功能介绍')">查看详情</button>
+                            </div>
+                        </div>
+
+                        <!-- Google Translate -->
+                        <div class="platform-card" data-category="capabilities">
+                            <div class="card-header">
+                                <div class="card-icon" style="background: linear-gradient(135deg, #4285F4 0%, #1967D2 100%);">
+                                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
+                                        <circle cx="50" cy="50" r="25" fill="none" stroke="#ffffff" stroke-width="3"/>
+                                        <path d="M 35,50 Q 50,30 65,50" stroke="#ffffff" stroke-width="3" fill="none"/>
+                                        <path d="M 35,50 Q 50,70 65,50" stroke="#ffffff" stroke-width="3" fill="none"/>
+                                    </svg>
+                                </div>
+                                <h3 class="card-title">Google Translate</h3>
+                            </div>
+                            <p class="card-description">Google翻译,支持100+种语言互译,覆盖全球主要语言</p>
+                            <div class="card-tags">
+                                <span class="tag">100+语言</span>
+                                <span class="tag">全球覆盖</span>
+                                <span class="tag">实时翻译</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-primary" onclick="window.open('https://translate.google.com', '_blank')">立即使用</button>
+                                <button class="btn btn-secondary" onclick="alert('Google Translate功能介绍')">查看详情</button>
+                            </div>
+                        </div>
+
+                        <!-- 腾讯云翻译 -->
+                        <div class="platform-card" data-category="capabilities">
+                            <div class="card-header">
+                                <div class="card-icon" style="background: linear-gradient(135deg, #0052D9 0%, #0041B8 100%);">
+                                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
+                                        <rect x="30" y="35" width="40" height="30" rx="3" fill="none" stroke="#ffffff" stroke-width="3"/>
+                                        <line x1="38" y1="45" x2="62" y2="45" stroke="#ffffff" stroke-width="2"/>
+                                        <line x1="38" y1="55" x2="55" y2="55" stroke="#ffffff" stroke-width="2"/>
+                                        <path d="M 45,30 L 55,30 L 50,20 Z" fill="#ffffff"/>
+                                        <path d="M 45,70 L 55,70 L 50,80 Z" fill="#ffffff"/>
+                                    </svg>
+                                </div>
+                                <h3 class="card-title">腾讯云翻译</h3>
+                            </div>
+                            <p class="card-description">腾讯云机器翻译,支持文本翻译、文档翻译、图片翻译等多种场景</p>
+                            <div class="card-tags">
+                                <span class="tag">多场景</span>
+                                <span class="tag">文档翻译</span>
+                                <span class="tag">图片翻译</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-primary" onclick="window.open('https://cloud.tencent.com/product/tmt', '_blank')">立即使用</button>
+                                <button class="btn btn-secondary" onclick="alert('腾讯云翻译功能介绍')">查看详情</button>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- MCP Server工具 -->
+                <!-- MCP Server -->
                 <section class="section" id="mcp-servers">
-                    <h2 class="section-title">🔌 MCP Server工具</h2>
+                    <h2 class="section-title">🔌 MCP Server</h2>
                     <div class="card-grid">
                         <!-- 当前时间 -->
                         <div class="platform-card" data-category="mcp-servers">
@@ -2779,6 +3249,7 @@
 
             </div>
         </div>
+        </main>
     </div>
 
     <!-- 智能助手对话框 -->
@@ -2800,13 +3271,12 @@
                 <div class="message-avatar">🤖</div>
                 <div>
                     <div class="message-content">
-                        您好!我是AI智能助手,可以帮您快速找到需要的功能和资源。您可以问我:
+                        Hi，这里是九章智启 AI能力平台，在这里你可以得到公司AI能力相关的所有信息。你想先了解哪个方面呢？
                     </div>
                     <div class="quick-actions">
-                        <button class="quick-action-btn" data-query="开发平台">开发平台</button>
-                        <button class="quick-action-btn" data-query="基础能力">基础能力</button>
-                        <button class="quick-action-btn" data-query="场景模板">场景模板</button>
-                        <button class="quick-action-btn" data-query="AI模型">AI模型</button>
+                        <button class="quick-action-btn" data-query="有哪些可以使用的现有产品">有哪些可以使用的现有产品</button>
+                        <button class="quick-action-btn" data-query="目前可以使用的大模型有哪些">目前可以使用的大模型有哪些</button>
+                        <button class="quick-action-btn" data-query="我应该如何在特定场景中使用AI">我应该如何在特定场景中使用AI</button>
                     </div>
                 </div>
             </div>
@@ -2833,7 +3303,7 @@
         // 分类到section的映射
         const categoryToSection = {
             'all': null,  // 全部功能不跳转
-            'products': 'products',  // AI产品
+            'products': 'products',  // 上线产品
             'models': 'models',  // AI模型
             'templates': 'templates',  // 场景模板
             'capabilities': 'basic-capabilities',  // 基础能力
@@ -2967,8 +3437,276 @@
             });
         });
 
+        // ============ 左侧导航栏生成和交互 ============
+
+        // 导航数据结构
+        const navigationData = [
+            {
+                id: 'platforms',
+                title: '🛠️ 应用开发平台',
+                icon: '🛠️',
+                cards: [
+                    '腾讯ADP', 'Dify', 'N8N', 'Langchain', 'Agent SDK'
+                ]
+            },
+            {
+                id: 'basic-capabilities',
+                title: '🔧 基础能力与工具',
+                icon: '🔧',
+                subsections: [
+                    {
+                        id: 'doc-parse',
+                        title: '📄 文档解析',
+                        cards: ['庖丁', '毕昇', '自研解析引擎']
+                    },
+                    {
+                        id: 'knowledge-search',
+                        title: '🔍 知识检索',
+                        cards: ['腾讯ADP', 'Dify', '腾讯乐享', '自研检索引擎']
+                    },
+                    {
+                        id: 'ocr',
+                        title: '📸 OCR识别',
+                        cards: ['易道博识', 'MinerU', 'DeepSeek OCR', '自研OCR']
+                    },
+                    {
+                        id: 'asr',
+                        title: '🎤 ASR语音识别',
+                        cards: ['腾讯云ASR', '阿里云ASR', 'Whisper']
+                    },
+                    {
+                        id: 'tts',
+                        title: '🔊 TTS语音合成',
+                        cards: ['腾讯云TTS', 'MiniMax TTS']
+                    },
+                    {
+                        id: 'translation',
+                        title: '🌐 翻译服务',
+                        cards: ['DeepL', 'Google Translate', '腾讯云翻译']
+                    }
+                ]
+            },
+            {
+                id: 'templates',
+                title: '📋 场景模板',
+                icon: '📋',
+                subsections: [
+                    {
+                        id: 'info-extraction',
+                        title: '📊 信息提取',
+                        cards: ['合同信息提取', '发票信息提取', '简历信息提取']
+                    },
+                    {
+                        id: 'multimodal',
+                        title: '🎨 多模态',
+                        cards: ['图文混合理解', '视频内容分析', '语音转文字+理解']
+                    },
+                    {
+                        id: 'agent-templates',
+                        title: '🤖 Agent智能体',
+                        cards: ['智能客服Agent', '数据分析Agent', '代码助手Agent']
+                    },
+                    {
+                        id: 'workflow-templates',
+                        title: '⚙️ Workflow工作流',
+                        cards: ['文档审批流程', '数据处理流水线', '自动化报告生成']
+                    }
+                ]
+            },
+            {
+                id: 'mcp-servers',
+                title: '🔌 MCP Server',
+                icon: '🔌',
+                cards: [
+                    '当前时间', '当前位置', '天气查询', '汇率查询', 'Web搜索'
+                ]
+            },
+            {
+                id: 'models',
+                title: '🧠 模型中心',
+                icon: '🧠',
+                cards: [
+                    'DeepSeek V3', 'Qwen 2.5', 'GLM-4', 'Llama 3.1', 'Claude 3.5 Sonnet', 'GPT-4 Turbo'
+                ]
+            },
+            {
+                id: 'products',
+                title: '🎯 上线产品',
+                icon: '🎯',
+                cards: [
+                    '小金智能助手', '中金智阅', '智阅Pro Max', 'Data Agent', 'Trading Agent'
+                ]
+            }
+        ];
+
+        // 生成导航HTML
+        function generateNavigation() {
+            const sidebarNav = document.getElementById('sidebarNav');
+            if (!sidebarNav) return;
+
+            let navHTML = '';
+
+            navigationData.forEach(section => {
+                navHTML += `<div class="nav-section" data-section="${section.id}">`;
+                navHTML += `<div class="nav-section-title">`;
+                navHTML += `<span><span class="nav-section-icon">${section.icon}</span>${section.title.replace(section.icon + ' ', '')}</span>`;
+                navHTML += `<span class="nav-section-arrow">▶</span>`;
+                navHTML += `</div>`;
+
+                navHTML += `<div class="nav-subsection">`;
+
+                // 如果有子分类
+                if (section.subsections) {
+                    section.subsections.forEach(subsection => {
+                        // 二级菜单项包装器
+                        navHTML += `<div class="nav-subsection-wrapper">`;
+
+                        // 二级菜单标题
+                        navHTML += `<div class="nav-subsection-item" data-subsection="${subsection.title}">`;
+                        navHTML += `<span>${subsection.title}</span>`;
+                        navHTML += `<span class="nav-subsection-arrow">▶</span>`;
+                        navHTML += `</div>`;
+
+                        // 三级卡片列表
+                        navHTML += `<div class="nav-cards">`;
+                        subsection.cards.forEach(card => {
+                            navHTML += `<div class="nav-card-item" data-card="${card}">${card}</div>`;
+                        });
+                        navHTML += `</div>`;
+
+                        navHTML += `</div>`; // 关闭 nav-subsection-wrapper
+                    });
+                } else {
+                    // 直接显示卡片
+                    section.cards.forEach(card => {
+                        navHTML += `<div class="nav-card-item" data-card="${card}">${card}</div>`;
+                    });
+                }
+
+                navHTML += `</div>`;
+                navHTML += `</div>`;
+            });
+
+            sidebarNav.innerHTML = navHTML;
+
+            // 绑定事件
+            bindNavigationEvents();
+        }
+
+        // 绑定导航事件
+        function bindNavigationEvents() {
+            // 一级菜单展开/折叠
+            document.querySelectorAll('.nav-section-title').forEach(title => {
+                title.addEventListener('click', (e) => {
+                    const section = e.currentTarget.parentElement;
+                    const wasExpanded = section.classList.contains('expanded');
+
+                    // 可选:折叠其他section
+                    // document.querySelectorAll('.nav-section').forEach(s => s.classList.remove('expanded'));
+
+                    section.classList.toggle('expanded');
+
+                    // 如果是展开操作且没有子分类,滚动到该section
+                    if (!wasExpanded) {
+                        const sectionId = section.getAttribute('data-section');
+                        const targetSection = document.getElementById(sectionId);
+                        if (targetSection) {
+                            targetSection.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }
+                });
+            });
+
+            // 二级菜单展开/折叠和定位
+            document.querySelectorAll('.nav-subsection-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const wasExpanded = item.classList.contains('expanded');
+
+                    item.classList.toggle('expanded');
+
+                    // 如果是展开操作,尝试滚动到对应的子section标题
+                    if (!wasExpanded) {
+                        const subsectionId = item.closest('.nav-section').getAttribute('data-section');
+                        const subsectionTitle = item.getAttribute('data-subsection');
+
+                        // 尝试找到对应的h3标题
+                        const mainContent = document.getElementById('mainContent');
+                        const h3Elements = mainContent.querySelectorAll('h3');
+
+                        h3Elements.forEach(h3 => {
+                            if (h3.textContent.includes(subsectionTitle.replace(/[📄🔍📸🎤🔊🌐📊🎨🤖⚙️]\s*/, ''))) {
+                                h3.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center'
+                                });
+
+                                // 高亮标题
+                                h3.style.backgroundColor = '#fff5f5';
+                                h3.style.padding = '12px 16px';
+                                h3.style.borderRadius = '8px';
+                                h3.style.transition = 'all 0.3s';
+
+                                setTimeout(() => {
+                                    h3.style.backgroundColor = '';
+                                    h3.style.padding = '';
+                                }, 2000);
+                            }
+                        });
+                    }
+                });
+            });
+
+            // 卡片点击定位
+            document.querySelectorAll('.nav-card-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const cardName = item.getAttribute('data-card');
+                    scrollToCard(cardName);
+
+                    // 高亮当前选中项
+                    document.querySelectorAll('.nav-card-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+        }
+
+        // 滚动到指定卡片
+        function scrollToCard(cardName) {
+            const mainContent = document.getElementById('mainContent');
+            const cards = mainContent.querySelectorAll('.platform-card');
+
+            cards.forEach(card => {
+                const cardTitle = card.querySelector('.card-title');
+                if (cardTitle && cardTitle.textContent.trim() === cardName) {
+                    // 滚动到卡片
+                    card.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+
+                    // 高亮卡片
+                    card.style.transform = 'scale(1.05)';
+                    card.style.boxShadow = '0 8px 32px rgba(145, 14, 14, 0.3)';
+                    card.style.transition = 'all 0.3s';
+
+                    setTimeout(() => {
+                        card.style.transform = '';
+                        card.style.boxShadow = '';
+                    }, 2000);
+                }
+            });
+        }
+
         // 重新排列功能模块顺序
         document.addEventListener('DOMContentLoaded', () => {
+            // 生成左侧导航
+            generateNavigation();
+
+
             const contentArea = document.querySelector('.content-area');
             if (contentArea) {
                 const sections = {
@@ -3022,10 +3760,10 @@
 
         // 知识库 - 关键词到功能的映射
         const knowledgeBase = {
-            // AI产品相关
-            'ai产品': { section: 'products', name: 'AI产品', desc: 'AI产品集合', info: '我们提供多款AI产品，包括小金智能助手、中金智阅、智阅Pro Max、Data Agent和Trading Agent等。' },
-            '产品': { section: 'products', name: 'AI产品', desc: 'AI产品集合', info: '我们提供多款AI产品，包括小金智能助手、中金智阅、智阅Pro Max、Data Agent和Trading Agent等。' },
-            '有哪些产品': { section: 'products', name: 'AI产品', desc: 'AI产品集合', info: '我们提供多款AI产品，包括小金智能助手、中金智阅、智阅Pro Max、Data Agent和Trading Agent等。' },
+            // 上线产品相关
+            'ai产品': { section: 'products', name: '上线产品', desc: '上线产品集合', info: '我们提供多款上线产品，包括小金智能助手、中金智阅、智阅Pro Max、Data Agent和Trading Agent等。' },
+            '产品': { section: 'products', name: '上线产品', desc: '上线产品集合', info: '我们提供多款上线产品，包括小金智能助手、中金智阅、智阅Pro Max、Data Agent和Trading Agent等。' },
+            '有哪些产品': { section: 'products', name: '上线产品', desc: '上线产品集合', info: '我们提供多款上线产品，包括小金智能助手、中金智阅、智阅Pro Max、Data Agent和Trading Agent等。' },
             '小金': { section: 'products', name: '小金智能助手', desc: '个人AI智能助手', info: '小金智能助手是个人AI助手，支持智能问答、知识库检索、日程管理等功能，可以提升个人工作效率。' },
             '小金智能助手': { section: 'products', name: '小金智能助手', desc: '个人AI智能助手', info: '小金智能助手提供智能对话问答、个人知识库管理、日程提醒、文档快速检索等功能。' },
             '中金智阅': { section: 'products', name: '中金智阅', desc: '智能文档审核系统', info: '中金智阅是智能文档审核系统，可以自动进行合规检查、风险识别和内容审核。' },
@@ -3038,10 +3776,10 @@
             'trading agent': { section: 'products', name: 'Trading Agent', desc: '智能交易助手', info: 'Trading Agent是智能交易助手，提供市场分析、交易策略建议等功能。' },
             '交易': { section: 'products', name: 'Trading Agent', desc: '智能交易助手', info: 'Trading Agent是智能交易助手，提供市场分析、交易策略建议等功能。' },
 
-            // AI模型相关
-            'ai模型': { section: 'models', name: 'AI模型中心', desc: 'AI模型集合', info: '我们集成了多个主流AI模型，包括DeepSeek V3、Qwen 2.5、GLM-4、Llama 3.1、Claude 3.5、GPT-4 Turbo等。' },
-            '模型': { section: 'models', name: 'AI模型中心', desc: 'AI模型集合', info: '我们集成了多个主流AI模型，包括DeepSeek V3、Qwen 2.5、GLM-4、Llama 3.1、Claude 3.5、GPT-4 Turbo等。' },
-            '有哪些模型': { section: 'models', name: 'AI模型中心', desc: 'AI模型集合', info: '我们集成了多个主流AI模型，包括DeepSeek V3、Qwen 2.5、GLM-4、Llama 3.1、Claude 3.5、GPT-4 Turbo等。' },
+            // 模型中心相关
+            'ai模型': { section: 'models', name: '模型中心', desc: 'AI模型集合', info: '我们集成了多个主流AI模型，包括DeepSeek V3、Qwen 2.5、GLM-4、Llama 3.1、Claude 3.5、GPT-4 Turbo等。' },
+            '模型': { section: 'models', name: '模型中心', desc: 'AI模型集合', info: '我们集成了多个主流AI模型，包括DeepSeek V3、Qwen 2.5、GLM-4、Llama 3.1、Claude 3.5、GPT-4 Turbo等。' },
+            '有哪些模型': { section: 'models', name: '模型中心', desc: 'AI模型集合', info: '我们集成了多个主流AI模型，包括DeepSeek V3、Qwen 2.5、GLM-4、Llama 3.1、Claude 3.5、GPT-4 Turbo等。' },
             'deepseek': { section: 'models', name: 'DeepSeek V3', desc: '开源大语言模型', info: 'DeepSeek V3是开源大语言模型，具有强大的推理能力，支持671B参数，37B激活参数，训练成本仅557.6万美元。' },
             'qwen': { section: 'models', name: 'Qwen 2.5', desc: '通义千问大模型', info: 'Qwen 2.5是阿里巴巴的通义千问大模型，擅长中文理解和生成任务。' },
             '通义千问': { section: 'models', name: 'Qwen 2.5', desc: '通义千问大模型', info: 'Qwen 2.5是阿里巴巴的通义千问大模型，擅长中文理解和生成任务。' },
@@ -3126,14 +3864,14 @@
             'asr': { section: 'basic-capabilities', keyword: 'ASR', name: 'ASR语音识别', desc: '语音识别服务', info: 'ASR语音识别服务可以将语音转换为文字，支持多种语言和方言。' },
             '语音识别': { section: 'basic-capabilities', keyword: 'ASR', name: 'ASR语音识别', desc: '语音识别服务', info: 'ASR语音识别服务可以将语音转换为文字，支持多种语言和方言。' },
 
-            // MCP Server工具相关 - 只保留需要引导到模块页面的关键词，删除会触发直接回复的关键词
-            'mcp': { section: 'mcp-servers', name: 'MCP Server工具', desc: '实用工具集', info: 'MCP Server工具提供当前时间、当前位置、天气查询、汇率查询等实用功能，可以直接在对话中询问相关问题即可使用。' },
-            'mcp server': { section: 'mcp-servers', name: 'MCP Server工具', desc: '实用工具集', info: 'MCP Server工具提供当前时间、当前位置、天气查询、汇率查询等实用功能，可以直接在对话中询问相关问题即可使用。' },
+            // MCP Server相关 - 只保留需要引导到模块页面的关键词，删除会触发直接回复的关键词
+            'mcp': { section: 'mcp-servers', name: 'MCP Server', desc: '实用工具集', info: 'MCP Server提供当前时间、当前位置、天气查询、汇率查询等实用功能，可以直接在对话中询问相关问题即可使用。' },
+            'mcp server': { section: 'mcp-servers', name: 'MCP Server', desc: '实用工具集', info: 'MCP Server提供当前时间、当前位置、天气查询、汇率查询等实用功能，可以直接在对话中询问相关问题即可使用。' },
             // 注意：天气、汇率、时间、位置等实时查询关键词已删除，让它们走DeepSeek工具调用而不是知识库回复
 
-            // 开发平台相关
-            '开发平台': { section: 'platforms', name: '开发平台与工具', desc: '开发工具平台', info: '我们提供多个开发平台，包括腾讯ADP(主推)、Dify、N8N、Langchain、Agent SDK等。' },
-            '平台': { section: 'platforms', name: '开发平台与工具', desc: '开发工具平台', info: '我们提供多个开发平台，包括腾讯ADP(主推)、Dify、N8N、Langchain、Agent SDK等。' },
+            // 应用开发平台相关
+            '开发平台': { section: 'platforms', name: '应用开发平台', desc: '应用开发平台', info: '我们提供多个应用开发平台，包括腾讯ADP(主推)、Dify、N8N、Langchain、Agent SDK等。' },
+            '平台': { section: 'platforms', name: '应用开发平台', desc: '应用开发平台', info: '我们提供多个应用开发平台，包括腾讯ADP(主推)、Dify、N8N、Langchain、Agent SDK等。' },
             'dify': {
                 section: 'platforms',
                 keyword: 'Dify',
@@ -3191,7 +3929,15 @@
             '客服': { section: 'cases', name: '智能客服', desc: '智能客服场景', info: '智能客服可以自动回答用户问题，支持多轮对话和工具调用。' },
             '智能客服': { section: 'cases', name: '智能客服', desc: '智能客服场景', info: '智能客服可以自动回答用户问题，支持多轮对话和工具调用。' },
             '质检': { section: 'cases', name: '智能质检', desc: '智能质检场景', info: '智能质检可以自动检查客服对话质量、合规性等。' },
-            '推荐': { section: 'cases', name: '推荐引擎', desc: '推荐系统场景', info: '推荐引擎可以根据用户行为和偏好提供个性化推荐。' }
+            '推荐': { section: 'cases', name: '推荐引擎', desc: '推荐系统场景', info: '推荐引擎可以根据用户行为和偏好提供个性化推荐。' },
+
+            // 平台运营和联系方式相关
+            '智启上线': { section: 'platforms', name: '九章智启平台上线', desc: '平台上线相关', info: '九章智启AI平台上线相关事宜，请联系:\n• 技术支持: 刘鹏洋 (liupengyang@cicc.com.cn)\n• 平台负责人: 刘鹏洋\n• 业务咨询: 请通过企业内部协作平台联系AI平台团队' },
+            '智启联系': { section: 'platforms', name: '联系方式', desc: '联系平台团队', info: '九章智启AI平台联系方式:\n• 技术支持: 刘鹏洋 (liupengyang@cicc.com.cn)\n• 平台负责人: 刘鹏洋\n• 业务咨询: 请通过企业内部协作平台联系AI平台团队' },
+            '找谁': { section: 'platforms', name: '联系方式', desc: '联系平台团队', info: '九章智启AI平台相关事宜请联系:\n• 技术支持与平台负责人: 刘鹏洋 (liupengyang@cicc.com.cn)\n• 使用问题、功能需求、上线部署等都可以联系' },
+            '联系': { section: 'platforms', name: '联系方式', desc: '联系平台团队', info: '九章智启AI平台相关事宜请联系:\n• 技术支持与平台负责人: 刘鹏洋 (liupengyang@cicc.com.cn)' },
+            '负责人': { section: 'platforms', name: '平台负责人', desc: '九章智启负责人', info: '九章智启AI平台负责人: 刘鹏洋\n• 邮箱: liupengyang@cicc.com.cn\n• 负责平台整体规划、技术支持、上线部署等工作' },
+            '技术支持': { section: 'platforms', name: '技术支持', desc: '平台技术支持', info: '九章智启AI平台技术支持: 刘鹏洋\n• 邮箱: liupengyang@cicc.com.cn\n• 提供平台使用指导、技术咨询、问题排查等支持' }
         };
 
         // 打开/关闭对话框
@@ -3528,8 +4274,8 @@
             const results = [];
             const queryLower = query.toLowerCase();
 
-            // 直接匹配
-            for (const [key, value] of Object.entries(intentMap)) {
+            // 直接匹配 knowledgeBase
+            for (const [key, value] of Object.entries(knowledgeBase)) {
                 if (key.toLowerCase().includes(queryLower) ||
                     queryLower.includes(key.toLowerCase()) ||
                     (value.name && value.name.toLowerCase().includes(queryLower)) ||
@@ -3581,16 +4327,16 @@
                 // 构建系统提示词,让AI了解当前页面的功能
                 const systemPrompt = `你是九章智启AI平台的智能助手。这个平台提供以下内容:
 
-1. AI产品:小金智能助手、中金智阅、智阅Pro Max、Data Agent、Trading Agent等
-2. AI模型:DeepSeek V3、Qwen 2.5、GLM-4、Llama 3.1、Claude 3.5、GPT-4 Turbo等
-3. 开发平台:腾讯ADP(主推)、Dify、N8N、Langchain、Agent SDK等
+1. 上线产品:小金智能助手、中金智阅、智阅Pro Max、Data Agent、Trading Agent等
+2. 模型中心:DeepSeek V3、Qwen 2.5、GLM-4、Llama 3.1、Claude 3.5、GPT-4 Turbo等
+3. 应用开发平台:腾讯ADP(主推)、Dify、N8N、Langchain、Agent SDK等
 4. 基础能力:文档解析(庖丁、毕昇)、知识检索(腾讯ADP、Dify、乐享)、OCR识别(易道博识、MinerU、DeepSeek OCR)、ASR语音识别等
-5. MCP Server工具:当前时间、当前位置、天气查询、汇率查询等实用工具
+5. MCP Server:当前时间、当前位置、天气查询、汇率查询等实用工具
 6. 场景模板:信息提取、多模态、Agent智能体、Workflow工作流等
 
 请以友好、专业的方式回答用户问题。如果用户询问某个具体产品或功能,请简要介绍并说明其用途。特别强调腾讯ADP是我们主推的企业级AI开发平台。
 
-【重要】MCP Server工具使用策略 - 要主动帮助用户查询,不要只是推荐:
+【重要】MCP Server使用策略 - 要主动帮助用户查询,不要只是推荐:
 
 1. 时间查询:
    • 用户询问时间相关问题时,立即使用get_current_time工具获取并告知结果
@@ -3618,7 +4364,7 @@
    【组合使用策略 - 既要搜索内部知识库,也要联网搜索获取全面信息】
 
    • 用户询问平台相关问题:
-     → "有哪些AI产品/模型/平台?" - 调用knowledge_base_search
+     → "有哪些产品/模型/平台?" - 调用knowledge_base_search
      → "支持什么功能/能力?" - 调用knowledge_base_search
      → "XXX是什么?" (如"Dify是什么") - 调用knowledge_base_search
 
@@ -3718,7 +4464,7 @@
                         type: 'function',
                         function: {
                             name: 'knowledge_base_search',
-                            description: '【必须主动使用】搜索九章智启AI平台的内部知识库,获取关于平台产品、模型、开发工具、基础能力、场景模板等的详细信息。\n\n必须使用的场景:\n• 用户询问平台相关问题(如"有哪些AI产品"、"支持哪些模型"、"Dify是什么") - 单独使用此工具\n• 用户询问对比/优劣势问题(如"Dify和ADP的区别"、"DeepSeek和GPT-4对比") - 必须先使用此工具获取内部知识,然后再使用web_search联网搜索更全面的对比信息\n• 用户询问功能特性(如"腾讯ADP支持什么功能"、"庖丁能做什么") - 单独使用此工具\n• 用户询问使用建议(如"我应该用哪个平台"、"推荐什么OCR工具") - 必须先使用此工具,然后配合web_search\n\n搜索范围包括:\n1. AI产品:小金智能助手、中金智阅、智阅Pro Max、Data Agent、Trading Agent等\n2. AI模型:DeepSeek V3、Qwen 2.5、GLM-4、Llama 3.1、Claude 3.5、GPT-4 Turbo等\n3. 开发平台:腾讯ADP(主推)、Dify、N8N、Langchain、Agent SDK等\n4. 基础能力:文档解析(庖丁、毕昇)、知识检索、OCR识别、ASR语音识别等\n5. 场景模板:信息提取、多模态、Agent智能体、Workflow工作流等\n\n重要:\n• 此工具搜索的是平台自有知识,不是互联网搜索\n• 对于对比/优劣势类问题,使用此工具只是第一步,之后必须配合web_search获取更全面的信息\n• 对于简单的"是什么"问题,单独使用此工具即可',
+                            description: '【必须主动使用】搜索九章智启AI平台的内部知识库,获取关于平台产品、模型、开发工具、基础能力、场景模板等的详细信息。\n\n必须使用的场景:\n• 用户询问平台相关问题(如"有哪些产品"、"支持哪些模型"、"Dify是什么") - 单独使用此工具\n• 用户询问对比/优劣势问题(如"Dify和ADP的区别"、"DeepSeek和GPT-4对比") - 必须先使用此工具获取内部知识,然后再使用web_search联网搜索更全面的对比信息\n• 用户询问功能特性(如"腾讯ADP支持什么功能"、"庖丁能做什么") - 单独使用此工具\n• 用户询问使用建议(如"我应该用哪个平台"、"推荐什么OCR工具") - 必须先使用此工具,然后配合web_search\n\n搜索范围包括:\n1. 上线产品:小金智能助手、中金智阅、智阅Pro Max、Data Agent、Trading Agent等\n2. 模型中心:DeepSeek V3、Qwen 2.5、GLM-4、Llama 3.1、Claude 3.5、GPT-4 Turbo等\n3. 应用开发平台:腾讯ADP(主推)、Dify、N8N、Langchain、Agent SDK等\n4. 基础能力:文档解析(庖丁、毕昇)、知识检索、OCR识别、ASR语音识别等\n5. 场景模板:信息提取、多模态、Agent智能体、Workflow工作流等\n\n重要:\n• 此工具搜索的是平台自有知识,不是互联网搜索\n• 对于对比/优劣势类问题,使用此工具只是第一步,之后必须配合web_search获取更全面的信息\n• 对于简单的"是什么"问题,单独使用此工具即可',
                             parameters: {
                                 type: 'object',
                                 properties: {
@@ -4143,9 +4889,70 @@
             return null;
         }
 
+        // 检测用户问题中的关键词并自动跳转到对应模块
+        function detectAndScrollToSection(message) {
+            const lowerMessage = message.toLowerCase();
+
+            // 定义关键词到section的映射规则(按优先级排序,更具体的放前面)
+            const sectionKeywords = [
+                // 上线产品相关
+                { keywords: ['现有产品', '有哪些产品', '上线产品', '产品列表', '产品有哪些'], section: 'products', name: '上线产品' },
+                { keywords: ['小金', '小金智能助手'], section: 'products', keyword: '小金智能助手', name: '小金智能助手' },
+                { keywords: ['中金智阅', '智阅'], section: 'products', keyword: '中金智阅', name: '中金智阅' },
+                { keywords: ['data agent', '数据分析'], section: 'products', keyword: 'Data Agent', name: 'Data Agent' },
+                { keywords: ['trading agent', '交易'], section: 'products', keyword: 'Trading Agent', name: 'Trading Agent' },
+
+                // 模型中心相关
+                { keywords: ['大模型', '模型有哪些', '有哪些模型', 'ai模型', '模型中心', '模型列表'], section: 'models', name: '模型中心' },
+                { keywords: ['deepseek'], section: 'models', keyword: 'DeepSeek V3', name: 'DeepSeek V3' },
+                { keywords: ['qwen', '通义千问'], section: 'models', keyword: 'Qwen 2.5', name: 'Qwen 2.5' },
+                { keywords: ['glm', '智谱'], section: 'models', keyword: 'GLM-4', name: 'GLM-4' },
+                { keywords: ['llama'], section: 'models', keyword: 'Llama 3.1', name: 'Llama 3.1' },
+                { keywords: ['claude'], section: 'models', keyword: 'Claude 3.5', name: 'Claude 3.5' },
+                { keywords: ['gpt'], section: 'models', keyword: 'GPT-4 Turbo', name: 'GPT-4 Turbo' },
+
+                // 应用开发平台相关
+                { keywords: ['开发平台', '应用开发', '平台有哪些'], section: 'platforms', name: '应用开发平台' },
+                { keywords: ['腾讯adp', 'adp'], section: 'platforms', keyword: '腾讯ADP', name: '腾讯ADP' },
+                { keywords: ['dify'], section: 'platforms', keyword: 'Dify', name: 'Dify' },
+                { keywords: ['n8n'], section: 'platforms', keyword: 'N8N', name: 'N8N' },
+                { keywords: ['langchain'], section: 'platforms', keyword: 'Langchain', name: 'Langchain' },
+
+                // 场景模板相关
+                { keywords: ['场景', '模板', '特定场景', '使用场景', '如何使用ai', '如何在.*场景'], section: 'templates', name: '场景模板' },
+
+                // 基础能力相关
+                { keywords: ['文档解析', '庖丁', '毕昇'], section: 'basic-capabilities', name: '基础能力与工具' },
+                { keywords: ['ocr', '文字识别', '图片识别'], section: 'basic-capabilities', name: '基础能力与工具' },
+                { keywords: ['知识检索', 'rag'], section: 'basic-capabilities', name: '基础能力与工具' },
+
+                // MCP Server相关
+                { keywords: ['mcp', '时间', '天气', '汇率', '位置'], section: 'mcp-servers', name: 'MCP Server' }
+            ];
+
+            // 遍历规则,找到第一个匹配的关键词
+            for (const rule of sectionKeywords) {
+                for (const keyword of rule.keywords) {
+                    // 使用正则表达式进行模糊匹配
+                    const regex = new RegExp(keyword, 'i');
+                    if (regex.test(lowerMessage)) {
+                        console.log(`检测到关键词: ${keyword}, 跳转到: ${rule.section}`);
+                        // 跳转到对应的section
+                        scrollToSection(rule.section, rule.keyword);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         // 处理用户消息
         async function handleUserMessage(message) {
             if (!message.trim()) return;
+
+            // 检测用户问题中的关键词并自动跳转到对应模块
+            detectAndScrollToSection(message);
 
             // 显示用户消息
             addMessage(message, 'user');
@@ -4194,9 +5001,9 @@
                 removeTypingIndicator();
                 console.error('DeepSeek API调用失败:', error);
                 addMessage('抱歉,我遇到了一些问题。您可以尝试问我:', 'bot', [
-                    { text: '查看AI产品', section: 'products', name: 'AI产品' },
-                    { text: '查看AI模型', section: 'models', name: 'AI模型' },
-                    { text: '查看开发平台', section: 'platforms', name: '开发平台' },
+                    { text: '查看上线产品', section: 'products', name: '上线产品' },
+                    { text: '查看模型中心', section: 'models', name: '模型中心' },
+                    { text: '查看应用开发平台', section: 'platforms', name: '应用开发平台' },
                     { text: '查看场景模板', section: 'templates', name: '场景模板' }
                 ]);
             }
