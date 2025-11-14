@@ -1,0 +1,17 @@
+{
+  "name": "ai-stock-clone",
+  "version": "1.0.0",
+  "description": "This is a lightweight, static reproduction of the RockAlpha AI-Stock page: - Header with logo and tagline - Hero with key messaging and CTAs - AI agent cards (avatars, names, quick copy buttons) - Live AI-sector ticker (mocked updates) - Live trades feed (mocked events) - Leaderboard (mocked PnL that updates over time)",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.21.1"
+  }
+}
