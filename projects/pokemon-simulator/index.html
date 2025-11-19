@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Battle Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="battlefield">
+        <!-- Player 1 -->
+        <div id="player1" class="pokemon">
+            <img src="" alt="Player 1 Pokémon">
+            <div class="hp-bar-container">
+                <div class="hp-bar" id="p1-hp"></div>
+            </div>
+            <div class="pokemon-name" id="p1-name"></div>
+        </div>
+
+        <!-- Player 2 -->
+        <div id="player2" class="pokemon">
+            <img src="" alt="Player 2 Pokémon">
+             <div class="hp-bar-container">
+                <div class="hp-bar" id="p2-hp"></div>
+            </div>
+            <div class="pokemon-name" id="p2-name"></div>
+        </div>
+    </div>
+    <div id="pokemon-selection">
+        <div class="player-selection-box">
+            <h2>玩家 1</h2>
+            <div class="selector">
+                <label for="region1-select">地区:</label>
+                <select id="region1-select"></select>
+            </div>
+            <div class="selector">
+                <label for="pokemon1-select">宝可梦:</label>
+                <select id="pokemon1-select" disabled></select>
+            </div>
+        </div>
+        <div class="player-selection-box">
+            <h2>玩家 2</h2>
+            <div class="selector">
+                <label for="region2-select">地区:</label>
+                <select id="region2-select"></select>
+            </div>
+            <div class="selector">
+                <label for="pokemon2-select">宝可梦:</label>
+                <select id="pokemon2-select" disabled></select>
+            </div>
+        </div>
+    </div>
+    <div id="controls">
+        <button id="start-battle-btn">加载并开始战斗</button>
+    </div>
+    <div id="winner-display" class="hidden"></div>
+
+    <div id="battle-log">
+        <p id="log-text">请输入宝可梦的英文名，然后开始战斗。</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
