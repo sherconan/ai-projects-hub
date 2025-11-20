@@ -1664,9 +1664,9 @@
         }
 
         .task-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
         }
 
         .task-item {
@@ -1677,10 +1677,10 @@
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 16px;
+            flex-direction: column;
+            gap: 12px;
             position: relative;
+            min-height: 130px;
         }
 
         .task-item:hover {
@@ -1716,33 +1716,41 @@
             line-height: 1.4;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
 
         .task-item-meta {
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
             gap: 4px;
-            min-width: 140px;
-            position: relative;
-            transition: opacity 0.2s;
-        }
-
-        .task-item:hover .task-item-meta {
-            opacity: 0;
+            margin-top: auto;
         }
 
         .task-item-cycle {
             font-size: 12px;
             color: #888;
-            white-space: nowrap;
+        }
+.task-item-app {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f0f0f0;
         }
 
-        .task-item-last-run {
+        .task-item-app-logo {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .task-item-app-name {
             font-size: 11px;
             color: #999;
-            white-space: nowrap;
         }
 
         .task-item-actions {
@@ -3030,7 +3038,13 @@
                         </div>
                         <div class="task-item-meta">
                             <div class="task-item-cycle">每日 15:40</div>
-                            <div class="task-item-last-run">上次执行: 11分钟前</div>
+                        </div>
+                        <div class="task-item-app">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="24" rx="4" fill="#5470ff"/>
+                                <path d="M7 9h10M7 12h10M7 15h7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span class="task-item-app-name">每日市场动态</span>
                         </div>
                         <div class="task-item-actions">
                             <button onclick="event.stopPropagation(); editTask('task1');" title="编辑">
@@ -3053,7 +3067,13 @@
                         </div>
                         <div class="task-item-meta">
                             <div class="task-item-cycle">每日 11:39</div>
-                            <div class="task-item-last-run">上次执行: 3小时前</div>
+                        </div>
+                        <div class="task-item-app">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="24" rx="4" fill="#8b7ce6"/>
+                                <text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-weight="bold">J</text>
+                            </svg>
+                            <span class="task-item-app-name">J-Agent</span>
                         </div>
                         <div class="task-item-actions">
                             <button onclick="event.stopPropagation(); editTask('task2');" title="编辑">
@@ -3076,7 +3096,13 @@
                         </div>
                         <div class="task-item-meta">
                             <div class="task-item-cycle">每日 09:00</div>
-                            <div class="task-item-last-run">上次执行: 6小时前</div>
+                        </div>
+                        <div class="task-item-app">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="24" rx="4" fill="#5470ff"/>
+                                <path d="M7 9h10M7 12h10M7 15h7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span class="task-item-app-name">每日市场动态</span>
                         </div>
                         <div class="task-item-actions">
                             <button onclick="event.stopPropagation(); editTask('task3');" title="编辑">
@@ -3099,7 +3125,13 @@
                         </div>
                         <div class="task-item-meta">
                             <div class="task-item-cycle">每周五 17:00</div>
-                            <div class="task-item-last-run">上次执行: 3天前</div>
+                        </div>
+                        <div class="task-item-app">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="24" rx="4" fill="#5470ff"/>
+                                <path d="M7 9h10M7 12h10M7 15h7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span class="task-item-app-name">每日市场动态</span>
                         </div>
                         <div class="task-item-actions">
                             <button onclick="event.stopPropagation(); editTask('task4');" title="编辑">
@@ -3122,7 +3154,13 @@
                         </div>
                         <div class="task-item-meta">
                             <div class="task-item-cycle">每日 14:00</div>
-                            <div class="task-item-last-run">上次执行: 未执行</div>
+                        </div>
+                        <div class="task-item-app">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="24" rx="4" fill="#5470ff"/>
+                                <path d="M7 9h10M7 12h10M7 15h7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span class="task-item-app-name">每日市场动态</span>
                         </div>
                         <div class="task-item-actions">
                             <button onclick="event.stopPropagation(); editTask('template1');" title="编辑">
@@ -3145,7 +3183,13 @@
                         </div>
                         <div class="task-item-meta">
                             <div class="task-item-cycle">每周一 10:20</div>
-                            <div class="task-item-last-run">上次执行: 未执行</div>
+                        </div>
+                        <div class="task-item-app">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="24" rx="4" fill="#8b7ce6"/>
+                                <text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-weight="bold">J</text>
+                            </svg>
+                            <span class="task-item-app-name">J-Agent</span>
                         </div>
                         <div class="task-item-actions">
                             <button onclick="event.stopPropagation(); editTask('template2');" title="编辑">
